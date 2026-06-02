@@ -22,12 +22,25 @@ import CDPODashboard from "./components/CDPO_panel/CDPODashboard";
 import DirectorDashboard from "./components/director_panel/DirectorDashboard";
 import About from './components/pages/About';
 import PhotoGallery from './components/pages/PhotoGallery'; // Import the new component
+import ProtectedRoute from "./components/all_login/ProtectedRoute";
+import AdminDashboard from "./components/admin_pannel/AdminDashboard";
+import ITCellDashboard from "./components/it_cell_pannel/ITCellDashboard";
+import DepartmentDashboard from "./components/department_pannel/DepartmentDashboard";
 
 
 function AppContent() {
   const location = useLocation();
 
-  const hideNavbarRoutes = ["/SupervisorDashBoard", "/DPODashboard", "/AnganwadiDashboard", "/CDPODashboard", "/DirectorDashboard"];
+  const hideNavbarRoutes = [
+    "/SupervisorDashBoard", 
+    "/DPODashBoard", 
+    "/AnganwadiDashBoard", 
+    "/CDPODashBoard", 
+    "/DirectorDashboard",
+    "/AdminDashboard",
+    "/ITCellDashboard",
+    "/DepartmentDashboard"
+  ];
   const shouldHideNavbar = hideNavbarRoutes.includes(location.pathname);
 
   return (
@@ -36,11 +49,18 @@ function AppContent() {
       <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
-          <Route path="/SupervisorDashBoard" element={<SupervisorDashBoard />} />
-          <Route path="/DPODashBoard" element={<DPODashboard />} />
-          <Route path="/AnganwadiDashBoard" element={<AnganwadiDashboard />} />
-          <Route path="/CDPODashBoard" element={<CDPODashboard />} />
-          <Route path="/DirectorDashboard" element={<DirectorDashboard />} />
+          
+          {/* Protected Routes */}
+          <Route path="/SupervisorDashBoard" element={<ProtectedRoute allowedRoles={['supervisor']}><SupervisorDashBoard /></ProtectedRoute>} />
+          <Route path="/DPODashBoard" element={<ProtectedRoute allowedRoles={['dpo']}><DPODashboard /></ProtectedRoute>} />
+          <Route path="/AnganwadiDashBoard" element={<ProtectedRoute allowedRoles={['anganwadi']}><AnganwadiDashboard /></ProtectedRoute>} />
+          <Route path="/CDPODashBoard" element={<ProtectedRoute allowedRoles={['cdpo']}><CDPODashboard /></ProtectedRoute>} />
+          <Route path="/DirectorDashboard" element={<ProtectedRoute allowedRoles={['director']}><DirectorDashboard /></ProtectedRoute>} />
+          
+          <Route path="/AdminDashboard" element={<ProtectedRoute allowedRoles={['admin']}><AdminDashboard /></ProtectedRoute>} />
+          <Route path="/ITCellDashboard" element={<ProtectedRoute allowedRoles={['it_cell']}><ITCellDashboard /></ProtectedRoute>} />
+          <Route path="/DepartmentDashboard" element={<ProtectedRoute allowedRoles={['department']}><DepartmentDashboard /></ProtectedRoute>} />
+
           <Route path="/Login" element={<Login />} />
           <Route path="/gallery" element={<PhotoGallery />} /> {/* Add a new route for the gallery */}
           

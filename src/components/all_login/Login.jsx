@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext';
@@ -6,6 +6,17 @@ import '../../assets/css/login.css';
 import ukLogo from '../../assets/images/uk_logo.png';
 import { API_BASE_URL } from '../../apiConfig';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
+
+const ROLE_DASHBOARD_MAP = {
+  admin: '/AdminDashboard',
+  it_cell: '/ITCellDashboard',
+  department: '/DepartmentDashboard',
+  supervisor: '/SupervisorDashBoard',
+  dpo: '/DPODashBoard',
+  cdpo: '/CDPODashBoard',
+  director: '/DirectorDashboard',
+  anganwadi: '/AnganwadiDashBoard',
+};
 
 const Login = () => {
   const [role, setRole] = useState('admin');
@@ -29,7 +40,15 @@ const Login = () => {
   ];
 
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, isAuthenticated, role: authRole } = useAuth();
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated && authRole) {
+      const targetPath = ROLE_DASHBOARD_MAP[authRole] || '/';
+      navigate(targetPath, { replace: true });
+    }
+  }, [isAuthenticated, authRole, navigate]);
 
   const handleRoleChange = (r) => {
     setRole(r);
@@ -68,12 +87,9 @@ const Login = () => {
         });
         alert("Login Success!");
 
-        // Update navigation routes based on your dashboard implementation
-        if (['director', 'dpo', 'cdpo'].includes(response.data.role)) {
-          navigate('/DashBord');
-        } else {
-          navigate('/UserDashboard');
-        }
+        // Determine path from response role
+        const targetPath = ROLE_DASHBOARD_MAP[response.data.role] || '/';
+        navigate(targetPath);
       }
     } catch (err) {
       setError(err.response?.data?.message || "Login Failed. Please check your credentials.");
