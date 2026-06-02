@@ -20,6 +20,7 @@ import DPODashboard from "./components/DPO_panel/DPODashboard";
 import AnganwadiDashboard from "./components/anganwadi_panel/AnganwadiDashboard";
 import CDPODashboard from "./components/CDPO_panel/CDPODashboard";
 import DirectorDashboard from "./components/director_panel/DirectorDashboard";
+import About from './components/pages/About';
 
 
 function AppContent() {
@@ -33,6 +34,7 @@ function AppContent() {
       {!shouldHideNavbar && <NavBar />}
       <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/about" element={<About />} />
           <Route path="/SupervisorDashBoard" element={<SupervisorDashBoard />} />
           <Route path="/DPODashBoard" element={<DPODashboard />} />
           <Route path="/AnganwadiDashBoard" element={<AnganwadiDashboard />} />

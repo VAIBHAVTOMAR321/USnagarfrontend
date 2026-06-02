@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Container, Row, Col, Card } from 'react-bootstrap';
+import { AboutSection } from './About';
 import '../../assets/css/home.css'
 
 function Home() {
@@ -111,6 +112,13 @@ function Home() {
               </Col>
             ))}
           </Row>
+        </Container>
+      </section>
+
+      {/* About Section Preview */}
+      <section className="home-about-preview py-5 bg-light">
+        <Container>
+          <AboutSection isPreview={true} />
         </Container>
       </section>
 

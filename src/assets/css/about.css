@@ -1,0 +1,145 @@
+.about-page-container {
+    min-height: 100vh;
+    background-color: #ffffff;
+    padding-top: 90px; /* Adjust this to match your NavBar height */
+    display: flex;
+    flex-direction: column;
+}
+
+.about-breadcrumb-area {
+    background: linear-gradient(rgba(0, 31, 63, 0.75), rgba(0, 31, 63, 0.75)), 
+                url('https://images.unsplash.com/photo-1493246507139-91e8bef99c02?auto=format&fit=crop&w=1920&q=80') center/cover no-repeat;
+    padding: 50px 0;
+    margin-bottom: 40px;
+    text-align: center;
+    border-bottom: 4px solid #00e5ff;
+}
+
+.breadcrumb-nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.breadcrumb-home {
+    color: #ffffff;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.breadcrumb-home:hover {
+    color: #00e5ff;
+}
+
+.breadcrumb-divider {
+    opacity: 0.6;
+}
+
+.breadcrumb-active {
+    color: #00e5ff;
+}
+
+.about-hero-img {
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    height: 420px;
+    object-fit: cover;
+}
+
+.about-tracker-text {
+    color: #00e5ff;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.about-main-heading {
+    color: #001f3f;
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 25px;
+    line-height: 1.2;
+}
+
+.section-title-large {
+    font-size: 2.1rem;
+    font-weight: 700;
+    letter-spacing: -1px;
+}
+
+.about-para-group p {
+    font-size: 15px;
+    color: #1e293b;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    line-height: 1.7;
+    margin-bottom: 20px;
+}
+
+.btn-about-more {
+    background-color: #001f3f;
+    color: white !important;
+    border-radius: 4px;
+    padding: 10px 28px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border: none;
+    display: inline-block;
+}
+
+.btn-about-more:hover {
+    background-color: #00e5ff;
+    color: #001f3f !important;
+    transform: translateX(5px);
+}
+
+/* Theme Colors */
+.text-navy { color: #001f3f !important; }
+.text-cyan { color: #00e5ff !important; }
+
+/* Department Cards Enhancement */
+.dept-card {
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    border: 1px solid rgba(0, 31, 63, 0.08) !important;
+    cursor: pointer;
+    background: #ffffff;
+    position: relative;
+    overflow: hidden;
+    border-radius: 12px !important;
+    min-height: 100px;
+}
+
+.dept-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background-color: #00e5ff;
+    transform: scaleY(0);
+    transition: transform 0.3s ease;
+}
+
+.dept-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(0, 31, 63, 0.12) !important;
+    border-color: #00e5ff !important;
+}
+
+.dept-card:hover::before {
+    transform: scaleY(1);
+}
+
+.hindi-typography {
+    font-family: inherit;
+    font-size: 1.15rem;
+    font-weight: 600 !important;
+    letter-spacing: 0.1px;
+}
