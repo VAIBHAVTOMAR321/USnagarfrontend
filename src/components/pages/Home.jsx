@@ -1,8 +1,101 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Container, Row, Col, Card } from 'react-bootstrap';
 import { AboutSection } from './About';
+import { GALLERY_IMAGES } from './PhotoGallery';
 import '../../assets/css/home.css'
+
+// Photo Gallery Carousel Component
+const HomePhotoGalleryCarousel = () => {
+  const [scrollPosition, setScrollPosition] = useState(0);
+  const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+  const carouselRef = useRef(null);
+
+  useEffect(() => {
+    const carousel = carouselRef.current;
+    if (!carousel || !isAutoPlaying) return;
+
+    const scrollInterval = setInterval(() => {
+      const maxScroll = carousel.scrollWidth - carousel.clientWidth;
+      setScrollPosition((prevPos) => {
+        const newPos = prevPos + 2;
+        return newPos > maxScroll ? 0 : newPos;
+      });
+    }, 30);
+
+    return () => clearInterval(scrollInterval);
+  }, [isAutoPlaying]);
+
+  useEffect(() => {
+    const carousel = carouselRef.current;
+    if (carousel) {
+      carousel.scrollLeft = scrollPosition;
+    }
+  }, [scrollPosition]);
+
+  const handleGalleryClick = () => {
+    window.location.href = '/gallery';
+  };
+
+  const scrollLeft = () => {
+    setIsAutoPlaying(false);
+    if (carouselRef.current) {
+      carouselRef.current.scrollBy({ left: -300, behavior: 'smooth' });
+    }
+  };
+
+  const scrollRight = () => {
+    setIsAutoPlaying(false);
+    if (carouselRef.current) {
+      carouselRef.current.scrollBy({ left: 300, behavior: 'smooth' });
+    }
+  };
+
+  return (
+    <div className="home-gallery-carousel-wrapper position-relative">
+      {/* Left Arrow */}
+      <button
+        className="home-gallery-arrow home-gallery-arrow-left"
+        onClick={scrollLeft}
+        aria-label="Previous gallery items"
+      >
+        <i className="bi bi-chevron-left"></i>
+      </button>
+
+      {/* Carousel Content */}
+      <div className="home-gallery-carousel-content" ref={carouselRef}>
+        {GALLERY_IMAGES.map((image) => (
+          <div
+            key={image.id}
+            className="home-gallery-item"
+            onClick={handleGalleryClick}
+            role="button"
+            tabIndex={0}
+            onKeyPress={(e) => e.key === 'Enter' && handleGalleryClick()}
+          >
+            <div className="home-gallery-card shadow-sm">
+              <div className="home-gallery-image">
+                <img src={image.url} alt={image.title} />
+              </div>
+              <div className="home-gallery-title">
+                <h6 className="mb-0">{image.title}</h6>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Right Arrow */}
+      <button
+        className="home-gallery-arrow home-gallery-arrow-right"
+        onClick={scrollRight}
+        aria-label="Next gallery items"
+      >
+        <i className="bi bi-chevron-right"></i>
+      </button>
+    </div>
+  );
+};
 
 function Home() {
   const [showScroll, setShowScroll] = useState(false);
@@ -119,6 +212,20 @@ function Home() {
       <section className="home-about-preview py-5 bg-light">
         <Container>
           <AboutSection isPreview={true} />
+        </Container>
+      </section>
+
+      {/* Photo Gallery Carousel Section */}
+      <section className="home-photo-gallery-section py-5 bg-white">
+        <Container>
+          <div className="text-center mb-5">
+            <h2 className="section-title-gov fw-bold">PHOTO GALLERY</h2>
+            <h5 className="mb-3 text-cyan" style={{ letterSpacing: '1px' }}>A Glimpse into our District</h5>
+            <p className="text-muted mx-auto" style={{ maxWidth: '800px' }}>
+              Browse through our collection of photographs showcasing the beauty and administrative milestones of the region.
+            </p>
+          </div>
+          <HomePhotoGalleryCarousel />
         </Container>
       </section>
 

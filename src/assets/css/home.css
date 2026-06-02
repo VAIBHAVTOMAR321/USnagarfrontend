@@ -761,3 +761,227 @@ button:focus {
   background: var(--gov-saffron);
   transform: scale(1.1) translateY(-3px);
 }
+
+/* ==========================================
+   HOME PHOTO GALLERY CAROUSEL
+   ========================================== */
+
+.home-photo-gallery-section {
+  background: var(--gov-white);
+  border-top: 1px solid var(--gov-border);
+}
+
+.home-gallery-carousel-wrapper {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+  padding: 20px 0;
+}
+
+/* Gallery Arrow Navigation */
+.home-gallery-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  background: var(--gov-blue);
+  border: 2px solid var(--gov-blue);
+  color: var(--gov-white);
+  font-size: 20px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 3px 10px rgba(0, 0, 128, 0.25);
+}
+
+.home-gallery-arrow:hover {
+  background: var(--gov-saffron);
+  border-color: var(--gov-saffron);
+  box-shadow: 0 5px 14px rgba(255, 153, 51, 0.4);
+  transform: translateY(-50%) scale(1.1);
+}
+
+.home-gallery-arrow:active {
+  transform: translateY(-50%) scale(0.95);
+}
+
+.home-gallery-arrow-left {
+  left: 10px;
+}
+
+.home-gallery-arrow-right {
+  right: 10px;
+}
+
+@media (max-width: 768px) {
+  .home-gallery-arrow {
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
+  }
+
+  .home-gallery-arrow-left {
+    left: 8px;
+  }
+
+  .home-gallery-arrow-right {
+    right: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .home-gallery-arrow {
+    width: 36px;
+    height: 36px;
+    font-size: 16px;
+  }
+
+  .home-gallery-arrow-left {
+    left: 5px;
+  }
+
+  .home-gallery-arrow-right {
+    right: 5px;
+  }
+}
+
+.home-gallery-carousel-content {
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+  padding: 20px;
+  scroll-behavior: smooth;
+  /* Hide scrollbar but keep functionality */
+  scrollbar-width: none;
+}
+
+.home-gallery-carousel-content::-webkit-scrollbar {
+  display: none;
+}
+
+.home-gallery-item {
+  flex: 0 0 auto;
+  min-width: 280px;
+  cursor: pointer;
+  transition: transform 0.3s ease-out;
+}
+
+.home-gallery-item:hover {
+  transform: translateY(-8px);
+}
+
+@media (max-width: 768px) {
+  .home-gallery-item {
+    min-width: 220px;
+  }
+}
+
+@media (max-width: 480px) {
+  .home-gallery-item {
+    min-width: 180px;
+  }
+}
+
+.home-gallery-card {
+  background: var(--gov-white);
+  border-radius: 8px;
+  overflow: hidden;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.home-gallery-card:hover {
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+.home-gallery-image {
+  position: relative;
+  width: 100%;
+  padding-top: 66.67%;
+  overflow: hidden;
+  background: linear-gradient(135deg, #e0e7ff 0%, #f0f5ff 100%);
+}
+
+.home-gallery-image img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease-out;
+}
+
+.home-gallery-item:hover .home-gallery-image img {
+  transform: scale(1.08);
+}
+
+.home-gallery-title {
+  flex: 1;
+  padding: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--gov-white);
+  border-top: 1px solid #f0f0f0;
+  min-height: 60px;
+}
+
+.home-gallery-title h6 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--gov-blue);
+  text-align: center;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+@media (max-width: 768px) {
+  .home-gallery-carousel-content {
+    padding: 15px;
+    gap: 15px;
+  }
+
+  .home-gallery-item {
+    min-width: 220px;
+  }
+
+  .home-gallery-title {
+    padding: 12px;
+    min-height: 55px;
+  }
+
+  .home-gallery-title h6 {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .home-gallery-carousel-content {
+    padding: 10px;
+    gap: 12px;
+  }
+
+  .home-gallery-item {
+    min-width: 180px;
+  }
+
+  .home-gallery-title {
+    padding: 10px;
+    min-height: 50px;
+  }
+
+  .home-gallery-title h6 {
+    font-size: 0.85rem;
+  }
+}

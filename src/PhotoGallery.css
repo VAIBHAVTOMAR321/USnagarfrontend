@@ -1,0 +1,188 @@
+/* Base styles for the gallery container */
+.breadcrumbs-container {
+  max-width: 1280px; /* Matches container width */
+  margin-left: auto;
+  margin-right: auto;
+  padding: 1rem; /* Consistent padding */
+  background-color: #f8f9fa; /* Light background for subtle contrast */
+  border-bottom: 1px solid #e2e8f0; /* Subtle border at the bottom */
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03); /* Very subtle shadow */
+}
+
+.breadcrumbs-list {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  align-items: center;
+  flex-wrap: wrap; /* Allow wrapping on smaller screens */
+}
+
+.breadcrumbs-item {
+  display: flex;
+  align-items: center;
+  font-size: 0.95rem; /* Slightly larger font */
+  color: #6c757d; /* Muted text color */
+}
+
+.breadcrumbs-link {
+  color: #007bff; /* Standard link blue, can be adjusted to match your theme */
+  text-decoration: none;
+  transition: color 0.2s ease-in-out;
+}
+
+.breadcrumbs-link:hover {
+  color: #0056b3; /* Darker blue on hover */
+  text-decoration: underline;
+}
+
+.breadcrumbs-current {
+  color: #343a40; /* Darker color for the current page */
+  font-weight: 600; /* Semi-bold for current page */
+}
+
+.breadcrumbs-separator {
+  margin: 0 0.6rem; /* More space around separator */
+  color: #adb5bd; /* Lighter separator color */
+}
+
+/* End Breadcrumbs */
+
+.gallery-container {
+  min-height: 100vh;
+  background-color: #ffffff; /* bg-white */
+  color: #1f2937; /* text-gray-900 */
+}
+
+/* Header styles */
+.gallery-header {
+  padding-top: 4rem; /* py-16 */
+  padding-bottom: 4rem; /* py-16 */
+  background-color: #ffffff; /* bg-white */
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); /* shadow-sm */
+}
+
+.gallery-header .container {
+  max-width: 1280px; /* equivalent to Tailwind's 'container' for large screens */
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem; /* px-4 */
+  padding-right: 1rem; /* px-4 */
+  text-align: center;
+}
+
+.gallery-title {
+  font-size: 3rem; /* text-5xl (48px) */
+  font-weight: 800; /* font-extrabold */
+  text-transform: uppercase; /* uppercase */
+  letter-spacing: 0.1em; /* tracking-widest */
+  color: #1f2937; /* text-gray-800 */
+}
+
+/* Gallery Grid Section */
+.gallery-grid-section {
+  max-width: 1280px; /* container mx-auto */
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem; /* px-4 */
+  padding-right: 1rem; /* px-4 */
+  padding-top: 3rem; /* py-12 */
+  padding-bottom: 3rem; /* py-12 */
+}
+
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(1, minmax(0, 1fr)); /* grid-cols-1 */
+  gap: 2rem; /* gap-8 */
+}
+
+/* Responsive grid for small screens (sm: 640px) */
+@media (min-width: 640px) {
+  .gallery-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)); /* sm:grid-cols-2 */
+  }
+}
+
+/* Responsive grid for medium screens (md: 768px) */
+@media (min-width: 768px) {
+  .gallery-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr)); /* md:grid-cols-3 */
+  }
+}
+
+/* Responsive grid for large screens (lg: 1024px) */
+@media (min-width: 1024px) {
+  .gallery-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr)); /* lg:grid-cols-4 */
+  }
+}
+
+/* Gallery Card */
+.gallery-card {
+  background-color: #ffffff; /* bg-white */
+  border-radius: 12px; /* rounded-2xl */
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* shadow-lg */
+  transition: all 0.3s ease-in-out; /* transition-all duration-300 */
+  overflow: hidden;
+}
+
+.gallery-card:hover {
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); /* hover:shadow-xl */
+}
+
+.gallery-image-wrapper {
+  overflow: hidden;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+}
+
+.gallery-image {
+  width: 100%;
+  height: 12rem; /* h-48 */
+  object-fit: cover;
+  transform: scale(1); /* initial state for transition */
+  transition: transform 0.3s ease-in-out; /* transition-transform duration-300 */
+}
+
+.gallery-card:hover .gallery-image {
+  transform: scale(1.05); /* group-hover:scale-105 */
+}
+
+.gallery-card-title-wrapper {
+  padding: 1rem; /* p-4 */
+}
+
+.gallery-card-title {
+  font-size: 1.125rem; /* text-lg */
+  font-weight: 600; /* font-semibold */
+  color: #475569; /* text-slate-700 */
+}
+
+/* Scroll to Top Button */
+.scroll-to-top-button {
+  position: fixed;
+  bottom: 2rem; /* bottom-8 */
+  right: 2rem; /* right-8 */
+  background-color: #14b8a6; /* bg-teal-500 */
+  color: #ffffff; /* text-white */
+  padding: 1rem; /* p-4 */
+  border-radius: 9999px; /* rounded-full */
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* shadow-lg */
+  transition: all 0.3s ease-in-out; /* transition-all duration-300 */
+  outline: none; /* focus:outline-none */
+  z-index: 50; /* z-50 */
+  border: none; /* Ensure no default button border */
+  cursor: pointer;
+}
+
+.scroll-to-top-button:hover {
+  background-color: #0d9488; /* hover:bg-teal-600 */
+}
+
+.scroll-to-top-button:focus {
+  box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.5), 0 0 0 6px rgba(20, 184, 166, 0.25); /* focus:ring-2 focus:ring-teal-500 focus:ring-opacity-75 */
+}
+
+.scroll-to-top-button i {
+  font-size: 1.25rem; /* text-xl */
+}

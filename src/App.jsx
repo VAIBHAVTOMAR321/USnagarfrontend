@@ -21,6 +21,7 @@ import AnganwadiDashboard from "./components/anganwadi_panel/AnganwadiDashboard"
 import CDPODashboard from "./components/CDPO_panel/CDPODashboard";
 import DirectorDashboard from "./components/director_panel/DirectorDashboard";
 import About from './components/pages/About';
+import PhotoGallery from './components/pages/PhotoGallery'; // Import the new component
 
 
 function AppContent() {
@@ -41,6 +42,7 @@ function AppContent() {
           <Route path="/CDPODashBoard" element={<CDPODashboard />} />
           <Route path="/DirectorDashboard" element={<DirectorDashboard />} />
           <Route path="/Login" element={<Login />} />
+          <Route path="/gallery" element={<PhotoGallery />} /> {/* Add a new route for the gallery */}
           
         </Routes>
     </>
