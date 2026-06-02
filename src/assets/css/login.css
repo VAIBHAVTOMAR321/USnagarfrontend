@@ -104,6 +104,23 @@
   letter-spacing: 0.5px;
 }
 
+.password-toggle-btn {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  color: #6b7280;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  transition: color 0.2s;
+  z-index: 5;
+}
+
 .login-submit-btn {
   background-color: #008080 !important; /* Teal from NavBar */
   border-color: #008080 !important;

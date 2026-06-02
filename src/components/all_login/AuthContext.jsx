@@ -1,10 +1,11 @@
 import React, { createContext, useContext, useState, useMemo, useEffect } from 'react';
 import axios from 'axios';
+import { API_BASE_URL } from '../../apiConfig';
 
 const AuthContext = createContext(null);
 
 const STORAGE_KEY = 'gyandhara_auth';
-const API_URL = 'https://brjobsedu.com/gyandhara/gyandhara_backend/api';
+const API_URL = API_BASE_URL;
 
 let isRefreshing = false;
 let failedQueue = [];
@@ -57,7 +58,7 @@ const createAxiosInstance = (accessToken, refreshToken, logout) => {
         isRefreshing = true;
 
         try {
-          const response = await axios.post(`${API_URL}/refresh-token/`, {
+          const response = await axios.post(`${API_URL}/token/refresh/`, {
             refresh: refreshToken,
           });
 
@@ -147,7 +148,7 @@ export function AuthProvider({ children }) {
     if (!refreshToken) return null;
     
     try {
-      const response = await axios.post(`${API_URL}/refresh-token/`, {
+      const response = await axios.post(`${API_URL}/token/refresh/`, {
         refresh: refreshToken,
       });
       const { access } = response.data;

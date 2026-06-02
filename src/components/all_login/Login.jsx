@@ -4,16 +4,43 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 import '../../assets/css/login.css';
 import ukLogo from '../../assets/images/uk_logo.png';
+import { API_BASE_URL } from '../../apiConfig';
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
 const Login = () => {
-  const [role, setRole] = useState('super_admin');
-  const [emailOrPhone, setEmailOrPhone] = useState('Admin');
+  const [role, setRole] = useState('admin');
+  const [username, setUsername] = useState('admin');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+
+  const departmentList = [
+    { name: "Agriculture", label: "Agriculture (कृषि विभाग)" },
+    { name: "Horticulture", label: "Horticulture (उद्यान विभाग)" },
+    { name: "Animal Husbandry", label: "Animal Husbandry (पशु पालन विभाग)" },
+    { name: "Education", label: "Education (शिक्षा विभाग)" },
+    { name: "Health", label: "Health (स्वास्थ्य विभाग)" },
+    { name: "Revenue", label: "Revenue (राजस्व विभाग)" },
+    { name: "Social Welfare", label: "Social Welfare (समाज कल्याण विभाग)" },
+    { name: "Irrigation", label: "Irrigation (सिंचाई विभाग)" },
+    { name: "PWD", label: "PWD (लोक निर्माण विभाग)" },
+    { name: "Development", label: "Development (विकास विभाग)" }
+  ];
 
   const navigate = useNavigate();
   const { login } = useAuth();
+
+  const handleRoleChange = (r) => {
+    setRole(r);
+    if (r === 'admin') {
+      setUsername('admin');
+    } else if (r === 'it_cell') {
+      setUsername('itcell');
+    } else {
+      setUsername('');
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -22,13 +49,12 @@ const Login = () => {
 
     try {
       const payload = {
-        role: role,
+        username: username,
         password: password,
-        email_or_phone: emailOrPhone,
       };
 
       const response = await axios.post(
-        'https://brjobsedu.com/gyandhara/gyandhara_backend/api/login/',
+        `${API_BASE_URL}/login/`,
         payload
       );
 
@@ -72,16 +98,16 @@ const Login = () => {
         <div className="panel-right">
           
           <div className="role-selector-section mb-4">
-            <p className="role-selector-title small mb-2 fw-bold text-uppercase tracking-wider">Select Login Type</p>
+            <p className="role-selector-title small mb-2 fw-bold text-uppercase tracking-wider">Select Role</p>
             <div className="role-radio-group">
-              {['super_admin', 'it_cell', 'department'].map((r) => (
+              {['admin', 'it_cell', 'department'].map((r) => (
                 <label key={r} className={`role-label-custom ${role === r ? 'active' : ''}`}>
                   <input 
                     type="radio" 
                     name="role" 
                     value={r} 
                     checked={role === r} 
-                    onChange={(e) => setRole(e.target.value)} 
+                    onChange={(e) => handleRoleChange(e.target.value)} 
                   />
                   {r.replace('_', ' ').toUpperCase()}
                 </label>
@@ -97,23 +123,47 @@ const Login = () => {
               
               <div className="mb-3">
                 <label className="form-label small fw-bold text-muted">User ID</label>
-                <input 
-                  type="text" 
-                  className="form-control form-control-sm bg-light border-0" 
-                  value={emailOrPhone} 
-                  onChange={(e) => setEmailOrPhone(e.target.value)} 
-                />
+                {role === 'department' ? (
+                  <select 
+                    className="form-select form-select-sm bg-light border-0"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    required
+                  >
+                    <option value="">Select Department</option>
+                    {departmentList.map((dept) => (
+                      <option key={dept.name} value={dept.name}>{dept.label}</option>
+                    ))}
+                  </select>
+                ) : (
+                  <input 
+                    type="text" 
+                    className="form-control form-control-sm bg-light border-0" 
+                    value={username} 
+                    readOnly
+                  />
+                )}
               </div>
 
               <div className="mb-4">
                 <label className="form-label small fw-bold text-muted">Password</label>
-                <input 
-                  type="password" 
-                  className="form-control form-control-sm bg-light border-0" 
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
+                <div className="position-relative">
+                  <input 
+                    type={showPassword ? "text" : "password"} 
+                    className="form-control form-control-sm bg-light border-0 pe-5" 
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+                  <button 
+                    type="button"
+                    className="password-toggle-btn"
+                    onClick={() => setShowPassword(!showPassword)}
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                  >
+                    {showPassword ? <FaEyeSlash /> : <FaEye />}
+                  </button>
+                </div>
               </div>
 
               <div className="text-center">
