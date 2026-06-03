@@ -25,7 +25,7 @@ const AdminLeftNav = ({ sidebarOpen }) => {
           to="/AddWork" 
           className={`nav-link text-white rounded ${location.pathname === '/AddWork' ? 'bg-primary bg-opacity-25 shadow-sm active fw-bold' : 'opacity-75'}`}
         >
-          <i className="bi bi-list-task me-2"></i> Manage Works
+          <i className="bi bi-list-task me-2"></i> All Works
         </Link>
         <Link to="#" className="nav-link text-white rounded opacity-75">
           <i className="bi bi-people-fill me-2"></i> Manage Users
