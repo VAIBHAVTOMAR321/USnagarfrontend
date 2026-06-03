@@ -34,6 +34,15 @@ const AddWork = () => {
   const [editingWork, setEditingWork] = useState(null);
   const [editFormData, setEditFormData] = useState({});
 
+  // View Modal State
+  const [showViewModal, setShowViewModal] = useState(false);
+  const [viewingWork, setViewingWork] = useState(null);
+
+  const handleViewClick = (work) => {
+    setViewingWork(work);
+    setShowViewModal(true);
+  };
+
   const fetchDivisions = async () => {
     try {
       const res = await axios.get(`${API_BASE_URL}/divisions/?department=${departmentId}`, {
@@ -106,8 +115,14 @@ const AddWork = () => {
     setEditingWork(work);
     setEditFormData({
       id: work.id,
+      division: work.division,
+      vidhan_sabha: work.vidhan_sabha,
+      village_name: work.village_name,
+      head_name: work.head_name || '',
+      component: work.component || '',
+      scheme_type: work.scheme_type,
       project_name: work.project_name,
-      village_name: work.village_name
+      work_name: work.work_name
     });
     setShowEditModal(true);
   };
@@ -115,7 +130,13 @@ const AddWork = () => {
   const handleUpdate = async (e) => {
     e.preventDefault();
     try {
-      await axios.put(`${API_BASE_URL}/works/`, editFormData, {
+      const payload = {
+        ...editFormData,
+        division: parseInt(editFormData.division),
+        department: parseInt(departmentId)
+      };
+
+      await axios.put(`${API_BASE_URL}/works/`, payload, {
         headers: { 
           Authorization: `Bearer ${accessToken}`,
           'Content-Type': 'application/json'
@@ -268,25 +289,33 @@ const AddWork = () => {
                       <tr className="text-muted" style={{ fontSize: '0.75rem', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                         <th className="px-4 py-3">Work ID</th>
                         <th className="py-3">Division</th>
-                        <th className="py-3">Project Details</th>
+                        <th className="py-3">Vidhan Sabha</th>
                         <th className="py-3">Village</th>
+                        <th className="py-3">Project Name</th>
+                        <th className="py-3">Work Description</th>
+                        <th className="py-3">Head</th>
+                        <th className="py-3">Component</th>
                         <th className="py-3">Scheme</th>
-                        <th className="text-center py-3">Actions</th>
+                        <th className="text-center py-3" style={{ minWidth: '130px' }}>Actions</th>
                       </tr>
                     </thead>
                     <tbody style={{ fontSize: '0.85rem', color: '#334155' }}>
                       {works.map((work) => (
                       <tr key={work.id}>
                         <td className="px-4"><span className="badge bg-slate-100 text-slate-700 border fw-medium" style={{ backgroundColor: '#F1F5F9', color: '#475569' }}>{work.work_id}</span></td>
-                        <td className="text-truncate" style={{ maxWidth: '120px' }}>{work.division_name_en}</td>
-                        <td>
-                          <div className="fw-bold" style={{ color: '#1E293B' }}>{work.project_name}</div>
-                          <div className="text-muted x-small text-truncate" style={{ maxWidth: '250px', fontSize: '0.75rem' }}>{work.work_name}</div>
-                        </td>
+                        <td className="text-truncate" style={{ maxWidth: '100px' }}>{work.division_name_en}</td>
+                        <td>{work.vidhan_sabha}</td>
                         <td>{work.village_name}</td>
-                        <td><span className="fw-medium text-indigo-600" style={{ color: '#4F46E5' }}>{work.scheme_type}</span></td>
+                        <td className="text-truncate" style={{ maxWidth: '150px' }}>{work.project_name}</td>
+                        <td className="text-truncate" style={{ maxWidth: '150px' }}>{work.work_name}</td>
+                        <td className="text-truncate" style={{ maxWidth: '100px' }}>{work.head_name || 'N/A'}</td>
+                        <td>{work.component || 'N/A'}</td>
+                        <td><span className="fw-medium" style={{ color: '#4F46E5' }}>{work.scheme_type}</span></td>
                         <td className="text-center">
-                          <Button variant="link" size="sm" className="text-primary p-0 me-3 shadow-none opacity-75 hover-opacity-100" onClick={() => handleEditClick(work)}>
+                          <Button variant="link" size="sm" className="text-info p-0 me-2 shadow-none opacity-75 hover-opacity-100" title="View Details" onClick={() => handleViewClick(work)}>
+                            <i className="bi bi-eye"></i>
+                          </Button>
+                          <Button variant="link" size="sm" className="text-primary p-0 me-2 shadow-none opacity-75 hover-opacity-100" onClick={() => handleEditClick(work)}>
                             <i className="bi bi-pencil"></i>
                           </Button>
                           <Button variant="link" size="sm" className="text-danger p-0 shadow-none opacity-75 hover-opacity-100" onClick={() => handleDelete(work.id)}>
@@ -312,35 +341,155 @@ const AddWork = () => {
         </div>
       </main>
 
+      {/* View Work Modal */}
+      <Modal show={showViewModal} onHide={() => setShowViewModal(false)} centered size="lg">
+        <Modal.Header closeButton className="border-0 bg-light">
+          <Modal.Title className="fw-bold text-primary d-flex align-items-center" style={{ fontSize: '1.25rem' }}>
+            <i className="bi bi-info-circle-fill me-2"></i> Work Details
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body className="p-4">
+          {viewingWork && (
+            <div className="detail-container">
+              <Row className="g-3 mb-4">
+                <Col md={4}>
+                  <label className="text-secondary fw-bold text-uppercase d-block mb-1" style={{ fontSize: '0.75rem' }}>Work ID</label>
+                  <div className="fw-bold text-dark p-2 bg-white rounded border border-slate-200" style={{ fontSize: '0.875rem' }}>{viewingWork.work_id}</div>
+                </Col>
+                <Col md={4}>
+                  <label className="text-secondary fw-bold text-uppercase d-block mb-1" style={{ fontSize: '0.75rem' }}>Department</label>
+                  <div className="fw-semibold text-dark p-2 bg-white rounded border border-slate-200" style={{ fontSize: '0.875rem' }}>{viewingWork.department_name_en}</div>
+                </Col>
+                <Col md={4}>
+                  <label className="text-secondary fw-bold text-uppercase d-block mb-1" style={{ fontSize: '0.75rem' }}>Division</label>
+                  <div className="fw-semibold text-dark p-2 bg-white rounded border border-slate-200" style={{ fontSize: '0.875rem' }}>{viewingWork.division_name_en}</div>
+                </Col>
+                <Col md={4}>
+                  <label className="text-secondary fw-bold text-uppercase d-block mb-1" style={{ fontSize: '0.75rem' }}>Vidhan Sabha</label>
+                  <div className="fw-semibold text-dark p-2 bg-white rounded border border-slate-200" style={{ fontSize: '0.875rem' }}>{viewingWork.vidhan_sabha}</div>
+                </Col>
+                <Col md={4}>
+                  <label className="text-secondary fw-bold text-uppercase d-block mb-1" style={{ fontSize: '0.75rem' }}>Village Name</label>
+                  <div className="fw-semibold text-dark p-2 bg-white rounded border border-slate-200" style={{ fontSize: '0.875rem' }}>{viewingWork.village_name}</div>
+                </Col>
+                <Col md={4}>
+                  <label className="text-secondary fw-bold text-uppercase d-block mb-1" style={{ fontSize: '0.75rem' }}>Head Name</label>
+                  <div className="fw-semibold text-dark p-2 bg-white rounded border border-slate-200" style={{ fontSize: '0.875rem' }}>{viewingWork.head_name || 'N/A'}</div>
+                </Col>
+                <Col md={4}>
+                  <label className="text-secondary fw-bold text-uppercase d-block mb-1" style={{ fontSize: '0.75rem' }}>Component</label>
+                  <div className="fw-semibold text-dark p-2 bg-white rounded border border-slate-200" style={{ fontSize: '0.875rem' }}>{viewingWork.component || 'N/A'}</div>
+                </Col>
+                <Col md={4}>
+                  <label className="text-secondary fw-bold text-uppercase d-block mb-1" style={{ fontSize: '0.75rem' }}>Scheme Type</label>
+                  <div className="fw-semibold text-dark p-2 bg-white rounded border border-slate-200" style={{ fontSize: '0.875rem' }}>
+                    <span className="badge bg-primary-subtle text-primary border border-primary-subtle">{viewingWork.scheme_type}</span>
+                  </div>
+                </Col>
+              </Row>
+              <Row className="g-3">
+                <Col md={12}>
+                  <label className="text-secondary fw-bold text-uppercase d-block mb-1" style={{ fontSize: '0.75rem' }}>Project Name</label>
+                  <div className="fw-bold text-dark p-3 border rounded shadow-sm bg-white" style={{ fontSize: '1rem' }}>{viewingWork.project_name}</div>
+                </Col>
+                <Col md={12}>
+                  <label className="text-secondary fw-bold text-uppercase d-block mb-1" style={{ fontSize: '0.75rem' }}>Detailed Work Description</label>
+                  <div className="p-3 bg-white rounded border" style={{ whiteSpace: 'pre-wrap', minHeight: '100px', fontSize: '0.9rem', color: '#334155' }}>
+                    {viewingWork.work_name}
+                  </div>
+                </Col>
+              </Row>
+            </div>
+          )}
+        </Modal.Body>
+        <Modal.Footer className="border-0 bg-light">
+          <Button variant="secondary" className="rounded-pill px-4 fw-bold shadow-sm btn-sm" onClick={() => setShowViewModal(false)}>Close</Button>
+        </Modal.Footer>
+      </Modal>
+
       {/* Edit Work Modal */}
-      <Modal show={showEditModal} onHide={() => setShowEditModal(false)} centered>
-        <Modal.Header closeButton className="border-0">
-          <Modal.Title className="fw-bold">Update Work Info</Modal.Title>
+      <Modal show={showEditModal} onHide={() => setShowEditModal(false)} centered size="lg">
+        <Modal.Header closeButton className="border-0 bg-light">
+          <Modal.Title className="fw-bold text-primary">
+            <i className="bi bi-pencil-square me-2"></i> Update Work Details
+          </Modal.Title>
         </Modal.Header>
         <Form onSubmit={handleUpdate}>
-          <Modal.Body>
-            <Form.Group className="mb-3">
-              <Form.Label className="small fw-bold">Project Name</Form.Label>
-              <Form.Control 
-                type="text" 
-                value={editFormData.project_name || ''} 
-                onChange={(e) => setEditFormData({...editFormData, project_name: e.target.value})} 
-                required 
-              />
-            </Form.Group>
-            <Form.Group className="mb-3">
-              <Form.Label className="small fw-bold">Village Name</Form.Label>
-              <Form.Control 
-                type="text" 
-                value={editFormData.village_name || ''} 
-                onChange={(e) => setEditFormData({...editFormData, village_name: e.target.value})} 
-                required 
-              />
-            </Form.Group>
+          <Modal.Body className="p-4">
+            <Row className="g-3">
+              <Col md={6}>
+                <Form.Group>
+                  <Form.Label className="small fw-bold mb-1" style={{ fontSize: '0.75rem', color: '#475569' }}>Division <span className="text-danger">*</span></Form.Label>
+                  <Form.Select size="sm" value={editFormData.division || ''} onChange={(e) => setEditFormData({...editFormData, division: e.target.value})} required className="border-slate-200 shadow-none">
+                    <option value="">Select Division</option>
+                    {divisions.map(div => (
+                      <option key={div.id} value={div.id}>{div.name_en}</option>
+                    ))}
+                  </Form.Select>
+                </Form.Group>
+              </Col>
+              <Col md={6}>
+                <Form.Group>
+                  <Form.Label className="small fw-bold mb-1" style={{ fontSize: '0.75rem', color: '#475569' }}>Vidhan Sabha <span className="text-danger">*</span></Form.Label>
+                  <Form.Control size="sm" type="text" value={editFormData.vidhan_sabha || ''} onChange={(e) => setEditFormData({...editFormData, vidhan_sabha: e.target.value})} required className="border-slate-200 shadow-none" />
+                </Form.Group>
+              </Col>
+              <Col md={6}>
+                <Form.Group>
+                  <Form.Label className="small fw-bold mb-1" style={{ fontSize: '0.75rem', color: '#475569' }}>Village Name <span className="text-danger">*</span></Form.Label>
+                  <Form.Control size="sm" type="text" value={editFormData.village_name || ''} onChange={(e) => setEditFormData({...editFormData, village_name: e.target.value})} required className="border-slate-200 shadow-none" />
+                </Form.Group>
+              </Col>
+              <Col md={6}>
+                <Form.Group>
+                  <Form.Label className="small fw-bold mb-1" style={{ fontSize: '0.75rem', color: '#475569' }}>Head Name</Form.Label>
+                  <Form.Control size="sm" type="text" value={editFormData.head_name || ''} onChange={(e) => setEditFormData({...editFormData, head_name: e.target.value})} className="border-slate-200 shadow-none" />
+                </Form.Group>
+              </Col>
+              <Col md={6}>
+                <Form.Group>
+                  <Form.Label className="small fw-bold mb-1" style={{ fontSize: '0.75rem', color: '#475569' }}>Component</Form.Label>
+                  <Form.Control size="sm" type="text" value={editFormData.component || ''} onChange={(e) => setEditFormData({...editFormData, component: e.target.value})} className="border-slate-200 shadow-none" />
+                </Form.Group>
+              </Col>
+              <Col md={6}>
+                <Form.Group>
+                  <Form.Label className="small fw-bold mb-1" style={{ fontSize: '0.75rem', color: '#475569' }}>Scheme Type <span className="text-danger">*</span></Form.Label>
+                  <Form.Select size="sm" value={editFormData.scheme_type || ''} onChange={(e) => setEditFormData({...editFormData, scheme_type: e.target.value})} required className="border-slate-200 shadow-none">
+                    <option value="">Select Scheme</option>
+                    <option value="State Scheme">State Scheme</option>
+                    <option value="Central Scheme">Central Scheme</option>
+                  </Form.Select>
+                </Form.Group>
+              </Col>
+              <Col md={12}>
+                <Form.Group>
+                  <Form.Label className="small fw-bold mb-1" style={{ fontSize: '0.75rem', color: '#475569' }}>Project Name <span className="text-danger">*</span></Form.Label>
+                  <Form.Control size="sm" type="text" value={editFormData.project_name || ''} onChange={(e) => setEditFormData({...editFormData, project_name: e.target.value})} required className="border-slate-200 shadow-none" />
+                </Form.Group>
+              </Col>
+              <Col md={12}>
+                <Form.Group>
+                  <Form.Label className="small fw-bold mb-1" style={{ fontSize: '0.75rem', color: '#475569' }}>Work Description <span className="text-danger">*</span></Form.Label>
+                  <Form.Control 
+                    size="sm"
+                    as="textarea" 
+                    rows={3} 
+                    value={editFormData.work_name || ''} 
+                    onChange={(e) => setEditFormData({...editFormData, work_name: e.target.value})} 
+                    required 
+                    className="border-slate-200 shadow-none" 
+                    style={{ resize: 'vertical', fontSize: '0.85rem' }}
+                  />
+                </Form.Group>
+              </Col>
+            </Row>
           </Modal.Body>
-          <Modal.Footer className="border-0">
-            <Button variant="secondary" onClick={() => setShowEditModal(false)}>Cancel</Button>
-            <Button variant="primary" type="submit">Save Changes</Button>
+          <Modal.Footer className="border-0 bg-light">
+            <Button variant="secondary" className="rounded-pill px-4 btn-sm" onClick={() => setShowEditModal(false)}>Cancel</Button>
+            <Button variant="primary" className="rounded-pill px-4 btn-sm fw-bold shadow-sm" type="submit" style={{ backgroundColor: '#4F46E5', border: 'none' }}>
+              Save Changes
+            </Button>
           </Modal.Footer>
         </Form>
       </Modal>

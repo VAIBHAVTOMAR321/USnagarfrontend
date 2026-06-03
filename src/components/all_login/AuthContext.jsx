@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useMemo, useEffect } from 'react';
+import React, { createContext, useContext, useState, useMemo, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { API_BASE_URL } from '../../apiConfig';
 
@@ -95,22 +95,49 @@ export function AuthProvider({ children }) {
 
   // Restore auth state from localStorage on mount
   useEffect(() => {
-    const savedAuth = localStorage.getItem(STORAGE_KEY);
-    if (savedAuth) {
-      try {
-        const parsed = JSON.parse(savedAuth);
-        setUser(parsed.user || null);
-        setAccessToken(parsed.access || null);
-        setRefreshToken(parsed.refresh || null);
-        setRole(parsed.role || null);
-        setUniqueId(parsed.unique_id || null);
-        setDepartmentId(parsed.department_id || null);
-      } catch (err) {
-        console.error('Failed to parse auth data:', err);
-        localStorage.removeItem(STORAGE_KEY);
+    const initializeAuth = async () => {
+      const savedAuth = localStorage.getItem(STORAGE_KEY);
+      if (savedAuth) {
+        try {
+          const parsed = JSON.parse(savedAuth);
+          setUser(parsed.user || null);
+          setRefreshToken(parsed.refresh || null);
+          setRole(parsed.role || null);
+          setUniqueId(parsed.unique_id || null);
+          setDepartmentId(parsed.department_id || null);
+
+          if (parsed.refresh) {
+            // Auto-refresh token on page load/refresh
+            try {
+              const response = await axios.post(`${API_URL}/token/refresh/`, {
+                refresh: parsed.refresh,
+              });
+              setAccessToken(response.data.access);
+            } catch (error) {
+              console.error('Initial refresh failed:', error);
+              localStorage.clear();
+              setUser(null);
+              setAccessToken(null);
+              setRefreshToken(null);
+              setRole(null);
+              setUniqueId(null);
+              setDepartmentId(null);
+              if (window.location.pathname !== '/Login') {
+                window.location.href = '/Login';
+              }
+            }
+          } else {
+            setAccessToken(parsed.access || null);
+          }
+        } catch (err) {
+          console.error('Failed to parse auth data:', err);
+          localStorage.clear();
+        }
       }
-    }
-    setIsReady(true);
+      setIsReady(true);
+    };
+
+    initializeAuth();
   }, []);
 
   // Persist auth state to localStorage on changes
@@ -130,26 +157,30 @@ export function AuthProvider({ children }) {
     }
   }, [user, accessToken, refreshToken, role, uniqueId, departmentId]);
 
-  const login = (data) => {
+  const login = useCallback((data) => {
     setUser(data.user);
     setAccessToken(data.access);
     setRefreshToken(data.refresh);
     setRole(data.role);
     setUniqueId(data.unique_id);
     setDepartmentId(data.department_id);
-  };
+  }, []);
 
-  const logout = () => {
+  const logout = useCallback(() => {
     setUser(null);
     setAccessToken(null);
     setRefreshToken(null);
     setRole(null);
     setUniqueId(null);
     setDepartmentId(null);
-    localStorage.removeItem(STORAGE_KEY);
-  };
+    localStorage.clear();
+    // Force redirect to login page
+    if (window.location.pathname !== '/Login') {
+      window.location.href = '/Login';
+    }
+  }, []);
 
-  const refreshAccessToken = async () => {
+  const refreshAccessToken = useCallback(async () => {
     if (!refreshToken) return null;
     
     try {
@@ -163,7 +194,18 @@ export function AuthProvider({ children }) {
       logout();
       return null;
     }
-  };
+  }, [refreshToken, logout]);
+
+  // Proactive token refresh every 1 minute
+  useEffect(() => {
+    let intervalId;
+    if (accessToken && refreshToken) {
+      intervalId = setInterval(() => {
+        refreshAccessToken();
+      }, 60000); // 60,000ms = 1 minute
+    }
+    return () => clearInterval(intervalId);
+  }, [accessToken, refreshToken, refreshAccessToken]);
 
   const value = useMemo(() => ({
     user,
@@ -177,7 +219,7 @@ export function AuthProvider({ children }) {
     refreshAccessToken,
     isAuthenticated: !!accessToken,
     isReady,
-  }), [user, accessToken, refreshToken, role, uniqueId, departmentId, isReady]);
+  }), [user, accessToken, refreshToken, role, uniqueId, departmentId, isReady, login, logout, refreshAccessToken]);
 
   return (
     <AuthContext.Provider value={value}>
