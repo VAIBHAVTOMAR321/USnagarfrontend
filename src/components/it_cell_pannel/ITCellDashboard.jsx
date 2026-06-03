@@ -31,6 +31,9 @@ const ITCellDashboard = () => {
   const [divFormData, setDivFormData] = useState({ name_en: '', name_hi: '' });
   const [headFormData, setHeadFormData] = useState({ head_name: '' });
 
+  const [totalWorksCount, setTotalWorksCount] = useState(0);
+  const [loadingWorks, setLoadingWorks] = useState(true);
+
   const fetchDepartments = async () => {
     try {
       const res = await axios.get(`${API_BASE_URL}/departments/`, {
@@ -55,9 +58,23 @@ const ITCellDashboard = () => {
     }
   };
 
+  const fetchTotalWorks = async () => {
+    try {
+      const res = await axios.get(`${API_BASE_URL}/works/`, {
+        headers: { Authorization: `Bearer ${accessToken}` }
+      });
+      setTotalWorksCount(res.data.length);
+    } catch (err) {
+      console.error("Error fetching total works:", err);
+    } finally {
+      setLoadingWorks(false);
+    }
+  };
+
   useEffect(() => {
     fetchDepartments();
     fetchDivisions();
+    fetchTotalWorks();
   }, []);
 
   const handleEdit = (dept) => {
@@ -210,23 +227,46 @@ const ITCellDashboard = () => {
             {/* Department Count Card */}
             <div className="col-md-6 col-lg-3">
               <div 
-                className="card border-0 shadow-sm h-100 bg-primary text-white" 
+                className={`card border-0 shadow-sm h-100 transition-all ${showTable ? 'bg-primary-subtle' : 'bg-white'}`} 
                 style={{ cursor: 'pointer' }}
                 onClick={() => setShowTable(!showTable)}
               >
                 <div className="card-body d-flex align-items-center">
-                  <div className="bg-white bg-opacity-25 rounded p-3 me-3 text-white">
-                    <i className="bi bi-building fs-3"></i>
+                  <div className={`${showTable ? 'bg-white' : 'bg-primary-subtle'} rounded p-3 me-3 text-primary shadow-sm`}>
+                    <i className="bi bi-building-fill fs-3"></i>
                   </div>
                   <div>
-                    <h4 className="fw-bold mb-0">
+                    <h4 className={`fw-bold mb-0 ${showTable ? 'text-primary' : 'text-dark'}`}>
                       {loading ? <Spinner animation="border" size="sm" /> : departments.length}
                     </h4>
-                    <p className="small mb-0">Total Departments</p>
+                    <p className="text-muted small mb-0">Total Departments</p>
                   </div>
                 </div>
               </div>
             </div>
+
+            {/* Infrastructure Works Card */}
+            <div className="col-md-6 col-lg-3">
+              <div
+                className="card border-0 shadow-sm h-100 bg-white"
+                style={{ cursor: 'pointer' }}
+                onClick={() => navigate('/AddWork', { state: { openForm: false } })} // Navigate to AddWork, show table by default
+              >
+                <div className="card-body d-flex align-items-center">
+                  <div className="bg-info-subtle rounded p-3 me-3 text-info shadow-sm">
+                    <i className="bi bi-list-task fs-3"></i>
+                  </div>
+                  <div>
+                    <h4 className="fw-bold mb-0 text-dark">
+                      {loadingWorks ? <Spinner animation="border" size="sm" /> : totalWorksCount}
+                    </h4>
+                    <p className="text-muted small mb-0">Infrastructure Works</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+
 
             {[
               { label: 'CPU Usage', value: '24%', icon: 'bi-cpu', color: 'primary' },

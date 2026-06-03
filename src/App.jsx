@@ -26,6 +26,7 @@ import ProtectedRoute from "./components/all_login/ProtectedRoute";
 import AdminDashboard from "./components/admin_pannel/AdminDashboard";
 import ITCellDashboard from "./components/it_cell_pannel/ITCellDashboard";
 import DepartmentDashboard from "./components/department_pannel/DepartmentDashboard";
+import AdminLeftNav from "./components/admin_pannel/AdminLeftNav"; // Import AdminLeftNav
 import DepartmentDetailsManagement from "./components/it_cell_pannel/DepartmentDetailsManagement";
 import AddWork from "./components/department_pannel/AddWork";
 function AppContent() {
@@ -58,7 +59,7 @@ function AppContent() {
           <Route path="/AnganwadiDashBoard" element={<ProtectedRoute allowedRoles={['anganwadi']}><AnganwadiDashboard /></ProtectedRoute>} />
           <Route path="/CDPODashBoard" element={<ProtectedRoute allowedRoles={['cdpo']}><CDPODashboard /></ProtectedRoute>} />
           <Route path="/DirectorDashboard" element={<ProtectedRoute allowedRoles={['director']}><DirectorDashboard /></ProtectedRoute>} />
-          <Route path="/AddWork" element={<ProtectedRoute allowedRoles={['department']}><AddWork /></ProtectedRoute>} />
+          <Route path="/AddWork" element={<ProtectedRoute allowedRoles={['department', 'it_cell', 'admin']}><AddWork /></ProtectedRoute>} />
           <Route path="/AdminDashboard" element={<ProtectedRoute allowedRoles={['admin']}><AdminDashboard /></ProtectedRoute>} />
           <Route path="/ITCellDashboard" element={<ProtectedRoute allowedRoles={['it_cell']}><ITCellDashboard /></ProtectedRoute>} />
           <Route path="/DepartmentDashboard" element={<ProtectedRoute allowedRoles={['department']}><DepartmentDashboard /></ProtectedRoute>} />

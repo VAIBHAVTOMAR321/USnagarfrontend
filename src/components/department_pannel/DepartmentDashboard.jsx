@@ -31,6 +31,27 @@ const DepartmentDashboard = () => {
   const [showBulkHeadModal, setShowBulkHeadModal] = useState(false);
   const [bulkHeadName, setBulkHeadName] = useState('');
 
+  // New state for total works
+  const [totalWorksCount, setTotalWorksCount] = useState(0);
+  const [loadingWorks, setLoadingWorks] = useState(true);
+
+  const fetchTotalWorks = async () => {
+    if (!departmentId) return;
+    try {
+      const res = await axios.get(`${API_BASE_URL}/works/?department=${departmentId}`, {
+        headers: { Authorization: `Bearer ${accessToken}` }
+      });
+      
+      // Filter response to strictly count only this department's works
+      const departmentWorks = res.data.filter(w => String(w.department) === String(departmentId));
+      setTotalWorksCount(departmentWorks.length);
+    } catch (err) {
+      console.error("Error fetching total works:", err);
+    } finally {
+      setLoadingWorks(false);
+    }
+  };
+
   const fetchDepartments = async () => {
     try {
       const url = departmentId ? `${API_BASE_URL}/departments/${departmentId}/` : `${API_BASE_URL}/departments/`;
@@ -61,6 +82,7 @@ const DepartmentDashboard = () => {
   useEffect(() => {
     fetchDepartments();
     fetchDivisions();
+    fetchTotalWorks();
   }, [accessToken, departmentId]);
 
   const handleEdit = (dept) => {
@@ -183,19 +205,19 @@ const DepartmentDashboard = () => {
             {/* Total Departments Card (Toggle Table) */}
             <div className="col-md-6 col-lg-3">
               <div 
-                className="card border-0 shadow-sm h-100 bg-primary text-white" 
+                className={`card border-0 shadow-sm h-100 transition-all ${showTable ? 'bg-primary-subtle' : 'bg-white'}`} 
                 style={{ cursor: 'pointer' }}
                 onClick={() => setShowTable(!showTable)}
               >
                 <div className="card-body d-flex align-items-center">
-                  <div className="bg-white bg-opacity-25 rounded p-3 me-3 text-white">
-                    <i className="bi bi-building fs-3"></i>
+                  <div className={`${showTable ? 'bg-white' : 'bg-primary-subtle'} rounded p-3 me-3 text-primary shadow-sm`}>
+                    <i className="bi bi-building-fill fs-3"></i>
                   </div>
                   <div>
-                    <h4 className="fw-bold mb-0">
+                    <h4 className={`fw-bold mb-0 ${showTable ? 'text-primary' : 'text-dark'}`}>
                       {loading ? <Spinner animation="border" size="sm" /> : departments.length}
                     </h4>
-                    <p className="small mb-0">{departmentId ? 'My Department' : 'Total Departments'}</p>
+                    <p className="text-muted small mb-0">{departmentId ? 'My Department' : 'Total Departments'}</p>
                   </div>
                 </div>
               </div>
@@ -204,17 +226,38 @@ const DepartmentDashboard = () => {
             {/* Total Divisions Card (Toggle Table) */}
             <div className="col-md-6 col-lg-3">
               <div 
-                className="card border-0 shadow-sm h-100 bg-success text-white" 
+                className={`card border-0 shadow-sm h-100 transition-all ${showDivisionsTable ? 'bg-success-subtle' : 'bg-white'}`} 
                 style={{ cursor: 'pointer' }}
                 onClick={() => setShowDivisionsTable(!showDivisionsTable)}
               >
                 <div className="card-body d-flex align-items-center">
-                  <div className="bg-white bg-opacity-25 rounded p-3 me-3 text-white">
-                    <i className="bi bi-diagram-3 fs-3"></i>
+                  <div className={`${showDivisionsTable ? 'bg-white' : 'bg-success-subtle'} rounded p-3 me-3 text-success shadow-sm`}>
+                    <i className="bi bi-diagram-3-fill fs-3"></i>
                   </div>
                   <div>
-                    <h4 className="fw-bold mb-0">{divisions.length}</h4>
-                    <p className="small mb-0">{departmentId ? 'My Divisions' : 'Total Divisions'}</p>
+                    <h4 className={`fw-bold mb-0 ${showDivisionsTable ? 'text-success' : 'text-dark'}`}>{divisions.length}</h4>
+                    <p className="text-muted small mb-0">{departmentId ? 'My Divisions' : 'Total Divisions'}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* My Works Card */}
+            <div className="col-md-6 col-lg-3">
+              <div
+                className="card border-0 shadow-sm h-100 bg-white" 
+                style={{ cursor: 'pointer' }}
+                onClick={() => navigate('/AddWork')}
+              >
+                <div className="card-body d-flex align-items-center">
+                  <div className="bg-info-subtle rounded p-3 me-3 text-info shadow-sm">
+                    <i className="bi bi-list-task fs-3"></i>
+                  </div>
+                  <div>
+                    <h4 className="fw-bold mb-0 text-dark">
+                      {loadingWorks ? <Spinner animation="border" size="sm" /> : totalWorksCount}
+                    </h4>
+                    <p className="text-muted small mb-0">My Works</p>
                   </div>
                 </div>
               </div>

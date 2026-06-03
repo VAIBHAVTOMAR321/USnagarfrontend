@@ -1,7 +1,9 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 const ITCellLeftNav = ({ sidebarOpen }) => {
+  const location = useLocation();
+
   return (
     <aside 
       className={`bg-dark text-white p-3 flex-shrink-0 ${sidebarOpen ? 'd-block' : 'd-none'}`} 
@@ -9,28 +11,37 @@ const ITCellLeftNav = ({ sidebarOpen }) => {
     >
       <div className="d-flex align-items-center mb-4 pb-2 border-bottom border-secondary">
         <i className="bi bi-cpu-fill fs-3 me-2 text-info"></i>
-        <h4 className="m-0 fw-bold">IT Cell</h4>
+        <h4 className="m-0 fw-bold">IT Cell Panel</h4>
       </div>
       
       <nav className="nav flex-column gap-2">
-        <Link to="/ITCellDashboard" className="nav-link text-white rounded bg-info bg-opacity-25 shadow-sm">
-          <i className="bi bi-speedometer2 me-2"></i> Admin Dashboard
+        <Link 
+          to="/ITCellDashboard" 
+          className={`nav-link text-white rounded ${location.pathname === '/ITCellDashboard' ? 'bg-info bg-opacity-25 shadow-sm active fw-bold' : 'opacity-75'}`}
+        >
+          <i className="bi bi-speedometer2 me-2"></i> IT Cell Dashboard
         </Link>
-        <Link to="/ITCell/DepartmentDetails" className="nav-link text-white rounded opacity-75">
-          <i className="bi bi-building-gear me-2"></i> Department Details
+        <Link 
+          to="/ITCell/DepartmentDetails" 
+          className={`nav-link text-white rounded ${location.pathname === '/ITCell/DepartmentDetails' ? 'bg-info bg-opacity-25 shadow-sm active fw-bold' : 'opacity-75'}`}
+        >
+          <i className="bi bi-building-fill me-2"></i> Department Details
+        </Link>
+        <Link 
+          to="/AddWork" 
+          className={`nav-link text-white rounded ${location.pathname === '/AddWork' ? 'bg-info bg-opacity-25 shadow-sm active fw-bold' : 'opacity-75'}`}
+        >
+          <i className="bi bi-plus-square me-2"></i> Add/Manage Works
         </Link>
         <Link to="#" className="nav-link text-white rounded opacity-75">
-          <i className="bi bi-shield-check me-2"></i> Security Audit
+          <i className="bi bi-envelope-paper me-2"></i> Manage Requests
         </Link>
         <Link to="#" className="nav-link text-white rounded opacity-75">
-          <i className="bi bi-database-fill-gear me-2"></i> Data Backups
-        </Link>
-        <Link to="#" className="nav-link text-white rounded opacity-75">
-          <i className="bi bi-terminal-fill me-2"></i> Console Logs
+          <i className="bi bi-gear-fill me-2"></i> Settings
         </Link>
         <div className="mt-auto pt-4 border-top border-secondary">
           <Link to="#" className="nav-link text-white rounded opacity-75">
-            <i className="bi bi-pc-display me-2"></i> Hardware Inventory
+            <i className="bi bi-info-circle me-2"></i> Help & Support
           </Link>
         </div>
       </nav>

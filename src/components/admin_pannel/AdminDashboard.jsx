@@ -21,6 +21,9 @@ const AdminDashboard = () => {
   const [divisions, setDivisions] = useState([]);
   const [viewDetails, setViewDetails] = useState({ type: null, deptId: null });
 
+  // New state for total works
+  const [totalWorksCount, setTotalWorksCount] = useState(0);
+  const [loadingWorks, setLoadingWorks] = useState(true);
   useEffect(() => {
     const fetchDepartments = async () => {
       try {
@@ -46,8 +49,23 @@ const AdminDashboard = () => {
       }
     };
 
+    // New function to fetch total works
+    const fetchTotalWorks = async () => {
+      try {
+        const res = await axios.get(`${API_BASE_URL}/works/`, {
+          headers: { Authorization: `Bearer ${accessToken}` }
+        });
+        setTotalWorksCount(res.data.length); // Assuming res.data is an array of works
+      } catch (err) {
+        console.error("Error fetching total works:", err);
+      } finally {
+        setLoadingWorks(false);
+      }
+    };
+
     fetchDepartments();
     fetchDivisions();
+    fetchTotalWorks(); // Call the new fetch function
   }, [accessToken]);
 
   const handleLogout = () => {
@@ -76,12 +94,12 @@ const AdminDashboard = () => {
             {/* All Departments Card */}
             <div className="col-md-6 col-lg-3">
               <div 
-                className="card border-0 shadow-sm h-100" 
+                className={`card border-0 shadow-sm h-100 transition-all ${showTable ? 'bg-primary-subtle' : 'bg-white'}`} 
                 style={{ cursor: 'pointer' }}
                 onClick={() => setShowTable(!showTable)}
               >
                 <div className="card-body d-flex align-items-center">
-                  <div className="bg-primary-subtle rounded p-3 me-3 text-primary">
+                  <div className={`${showTable ? 'bg-white' : 'bg-primary-subtle'} rounded p-3 me-3 text-primary shadow-sm`}>
                     <i className="bi bi-building-fill fs-3"></i>
                   </div>
                   <div>
@@ -93,6 +111,29 @@ const AdminDashboard = () => {
                 </div>
               </div>
             </div>
+
+            {/* New All Works Card */}
+            <div className="col-md-6 col-lg-3">
+              <div
+                className="card border-0 shadow-sm h-100 bg-white" 
+                style={{ cursor: 'pointer' }}
+                onClick={() => navigate('/AddWork')} // Navigate to AddWork component
+              >
+                <div className="card-body d-flex align-items-center">
+                  <div className="bg-info-subtle rounded p-3 me-3 text-info shadow-sm">
+                    <i className="bi bi-list-task fs-3"></i> {/* Icon for tasks/works */}
+                  </div>
+                  <div>
+                    <h4 className="fw-bold mb-0 text-dark">
+                      {loadingWorks ? <Spinner animation="border" size="sm" /> : totalWorksCount}
+                    </h4>
+                    <p className="text-muted small mb-0">All Works</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+
 
             {[
               { label: 'Active Sessions', value: '87', icon: 'bi-activity', color: 'success' },
