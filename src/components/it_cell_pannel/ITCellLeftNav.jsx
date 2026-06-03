@@ -16,6 +16,9 @@ const ITCellLeftNav = ({ sidebarOpen }) => {
         <Link to="/ITCellDashboard" className="nav-link text-white rounded bg-info bg-opacity-25 shadow-sm">
           <i className="bi bi-speedometer2 me-2"></i> Admin Dashboard
         </Link>
+        <Link to="/ITCell/DepartmentDetails" className="nav-link text-white rounded opacity-75">
+          <i className="bi bi-building-gear me-2"></i> Department Details
+        </Link>
         <Link to="#" className="nav-link text-white rounded opacity-75">
           <i className="bi bi-shield-check me-2"></i> Security Audit
         </Link>

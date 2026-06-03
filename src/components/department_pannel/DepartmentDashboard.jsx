@@ -8,7 +8,7 @@ import DepartmentHeader from './DepartmentHeader';
 import DepartmentLeftNav from './DepartmentLeftNav';
 
 const DepartmentDashboard = () => {
-  const { logout, accessToken } = useAuth();
+  const { logout, accessToken, departmentId } = useAuth();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
@@ -33,10 +33,12 @@ const DepartmentDashboard = () => {
 
   const fetchDepartments = async () => {
     try {
-      const res = await axios.get(`${API_BASE_URL}/departments/`, {
+      const url = departmentId ? `${API_BASE_URL}/departments/${departmentId}/` : `${API_BASE_URL}/departments/`;
+      const res = await axios.get(url, {
         headers: { Authorization: `Bearer ${accessToken}` }
       });
-      setDepartments(res.data);
+      // If departmentId is set, the API returns a single object; wrap it in an array for component compatibility
+      setDepartments(departmentId ? [res.data] : res.data);
     } catch (err) {
       console.error("Error fetching departments:", err);
     } finally {
@@ -46,7 +48,8 @@ const DepartmentDashboard = () => {
 
   const fetchDivisions = async () => {
     try {
-      const res = await axios.get(`${API_BASE_URL}/divisions/`, {
+      const url = departmentId ? `${API_BASE_URL}/divisions/?department=${departmentId}` : `${API_BASE_URL}/divisions/`;
+      const res = await axios.get(url, {
         headers: { Authorization: `Bearer ${accessToken}` }
       });
       setDivisions(res.data);
@@ -58,7 +61,7 @@ const DepartmentDashboard = () => {
   useEffect(() => {
     fetchDepartments();
     fetchDivisions();
-  }, []);
+  }, [accessToken, departmentId]);
 
   const handleEdit = (dept) => {
     setSelectedDept(dept);
@@ -192,7 +195,7 @@ const DepartmentDashboard = () => {
                     <h4 className="fw-bold mb-0">
                       {loading ? <Spinner animation="border" size="sm" /> : departments.length}
                     </h4>
-                    <p className="small mb-0">Total Departments</p>
+                    <p className="small mb-0">{departmentId ? 'My Department' : 'Total Departments'}</p>
                   </div>
                 </div>
               </div>
@@ -211,7 +214,7 @@ const DepartmentDashboard = () => {
                   </div>
                   <div>
                     <h4 className="fw-bold mb-0">{divisions.length}</h4>
-                    <p className="small mb-0">Total Divisions</p>
+                    <p className="small mb-0">{departmentId ? 'My Divisions' : 'Total Divisions'}</p>
                   </div>
                 </div>
               </div>
@@ -240,7 +243,7 @@ const DepartmentDashboard = () => {
 
           {showTable && (
             <div className="card border-0 shadow-sm p-4 mt-4 animate-fade-in">
-              <h5 className="mb-4 fw-bold text-dark">Department Management</h5>
+              <h5 className="mb-4 fw-bold text-dark">{departmentId ? 'My Department Details' : 'Department Management'}</h5>
               <Table responsive hover className="align-middle">
                 <thead className="table-light">
                   <tr>

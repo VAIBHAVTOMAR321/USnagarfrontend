@@ -83,6 +83,7 @@ const Login = () => {
           refresh: response.data.refresh,
           role: response.data.role,
           unique_id: response.data.unique_id,
+          department_id: response.data.department_id,
           user: response.data.user || null,
         });
         alert("Login Success!");

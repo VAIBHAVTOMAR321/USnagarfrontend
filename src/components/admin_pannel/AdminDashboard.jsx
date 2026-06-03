@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Table, Spinner } from 'react-bootstrap';
+import { Table, Spinner, Badge } from 'react-bootstrap';
 import { useAuth } from '../all_login/AuthContext';
 import AdminHeader from './AdminHeader';
 import AdminLeftNav from './AdminLeftNav';
@@ -17,6 +17,10 @@ const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [showTable, setShowTable] = useState(false);
 
+  // Division Management State
+  const [divisions, setDivisions] = useState([]);
+  const [viewDetails, setViewDetails] = useState({ type: null, deptId: null });
+
   useEffect(() => {
     const fetchDepartments = async () => {
       try {
@@ -30,7 +34,20 @@ const AdminDashboard = () => {
         setLoading(false);
       }
     };
+
+    const fetchDivisions = async () => {
+      try {
+        const res = await axios.get(`${API_BASE_URL}/divisions/`, {
+          headers: { Authorization: `Bearer ${accessToken}` }
+        });
+        setDivisions(res.data);
+      } catch (err) {
+        console.error("Error fetching divisions:", err);
+      }
+    };
+
     fetchDepartments();
+    fetchDivisions();
   }, [accessToken]);
 
   const handleLogout = () => {
@@ -107,16 +124,87 @@ const AdminDashboard = () => {
                     <th>ID</th>
                     <th>English Name</th>
                     <th>Hindi Name</th>
+                    <th>Divisions</th>
+                    <th>Heads</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {departments.map((dept) => (
-                    <tr key={dept.id}>
-                      <td>{dept.id}</td>
-                      <td>{dept.name_en}</td>
-                      <td>{dept.name_hi}</td>
-                    </tr>
-                  ))}
+                  {departments.map((dept) => {
+                    const deptDivisions = divisions.filter(d => d.department === dept.id);
+                    const uniqueHeadsCount = new Set(deptDivisions.filter(d => d.head_name).map(d => d.head_name)).size;
+                    const isExpanded = viewDetails.deptId === dept.id;
+
+                    return (
+                      <React.Fragment key={dept.id}>
+                        <tr>
+                          <td>{dept.id}</td>
+                          <td>{dept.name_en}</td>
+                          <td>{dept.name_hi}</td>
+                          <td>
+                            <Badge 
+                              bg="primary" 
+                              className="p-2 cursor-pointer shadow-sm" 
+                              style={{ cursor: 'pointer' }}
+                              onClick={() => setViewDetails(isExpanded && viewDetails.type === 'divisions' ? { type: null, deptId: null } : { type: 'divisions', deptId: dept.id })}
+                            >
+                              {deptDivisions.length} Divisions
+                            </Badge>
+                          </td>
+                          <td>
+                            <Badge 
+                              bg="success" 
+                              className="p-2 cursor-pointer shadow-sm" 
+                              style={{ cursor: 'pointer' }}
+                              onClick={() => setViewDetails(isExpanded && viewDetails.type === 'heads' ? { type: null, deptId: null } : { type: 'heads', deptId: dept.id })}
+                            >
+                              {uniqueHeadsCount} Heads
+                            </Badge>
+                          </td>
+                        </tr>
+                        {isExpanded && (
+                          <tr>
+                            <td colSpan={5} className="bg-light p-0">
+                              <div className="p-3 border-start border-end border-bottom animate-fade-in">
+                                <div className="d-flex justify-content-between align-items-center mb-2">
+                                  <h6 className="fw-bold m-0 text-secondary">
+                                    {viewDetails.type === 'divisions' ? 'Division List' : 'Head Assignments'} — {dept.name_en}
+                                  </h6>
+                                  <button 
+                                    className="btn btn-sm btn-outline-secondary border-0"
+                                    onClick={() => setViewDetails({ type: null, deptId: null })}
+                                  >
+                                    <i className="bi bi-x-lg"></i>
+                                  </button>
+                                </div>
+                                <Table size="sm" bordered hover className="bg-white mb-0 shadow-sm">
+                                  <thead className="table-secondary">
+                                    <tr>
+                                      <th>Division (English)</th>
+                                      <th>Division (Hindi)</th>
+                                      <th>Head Name</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    {deptDivisions.length > 0 ? deptDivisions.map(div => (
+                                      <tr key={div.id}>
+                                        <td>{div.name_en}</td>
+                                        <td>{div.name_hi}</td>
+                                        <td className="fw-bold">{div.head_name || <span className="text-muted">No Head Assigned</span>}</td>
+                                      </tr>
+                                    )) : (
+                                      <tr>
+                                        <td colSpan={3} className="text-center py-2 text-muted italic">No divisions found for this department.</td>
+                                      </tr>
+                                    )}
+                                  </tbody>
+                                </Table>
+                              </div>
+                            </td>
+                          </tr>
+                        )}
+                      </React.Fragment>
+                    );
+                  })}
                 </tbody>
               </Table>
             </div>

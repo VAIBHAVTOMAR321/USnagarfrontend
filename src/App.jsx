@@ -26,8 +26,8 @@ import ProtectedRoute from "./components/all_login/ProtectedRoute";
 import AdminDashboard from "./components/admin_pannel/AdminDashboard";
 import ITCellDashboard from "./components/it_cell_pannel/ITCellDashboard";
 import DepartmentDashboard from "./components/department_pannel/DepartmentDashboard";
-
-
+import DepartmentDetailsManagement from "./components/it_cell_pannel/DepartmentDetailsManagement";
+import AddWork from "./components/department_pannel/AddWork";
 function AppContent() {
   const location = useLocation();
 
@@ -39,7 +39,9 @@ function AppContent() {
     "/DirectorDashboard",
     "/AdminDashboard",
     "/ITCellDashboard",
-    "/DepartmentDashboard"
+    "/DepartmentDashboard",
+    "/ITCell/DepartmentDetails",
+    "/AddWork",
   ];
   const shouldHideNavbar = hideNavbarRoutes.includes(location.pathname);
 
@@ -56,11 +58,11 @@ function AppContent() {
           <Route path="/AnganwadiDashBoard" element={<ProtectedRoute allowedRoles={['anganwadi']}><AnganwadiDashboard /></ProtectedRoute>} />
           <Route path="/CDPODashBoard" element={<ProtectedRoute allowedRoles={['cdpo']}><CDPODashboard /></ProtectedRoute>} />
           <Route path="/DirectorDashboard" element={<ProtectedRoute allowedRoles={['director']}><DirectorDashboard /></ProtectedRoute>} />
-          
+          <Route path="/AddWork" element={<ProtectedRoute allowedRoles={['department']}><AddWork /></ProtectedRoute>} />
           <Route path="/AdminDashboard" element={<ProtectedRoute allowedRoles={['admin']}><AdminDashboard /></ProtectedRoute>} />
           <Route path="/ITCellDashboard" element={<ProtectedRoute allowedRoles={['it_cell']}><ITCellDashboard /></ProtectedRoute>} />
           <Route path="/DepartmentDashboard" element={<ProtectedRoute allowedRoles={['department']}><DepartmentDashboard /></ProtectedRoute>} />
-
+          <Route path="/ITCell/DepartmentDetails" element={<ProtectedRoute allowedRoles={['it_cell']}><DepartmentDetailsManagement /></ProtectedRoute>} />  
           <Route path="/Login" element={<Login />} />
           <Route path="/gallery" element={<PhotoGallery />} /> {/* Add a new route for the gallery */}
           

@@ -1,7 +1,9 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 const DepartmentLeftNav = ({ sidebarOpen }) => {
+  const location = useLocation();
+
   return (
     <aside 
       className={`bg-dark text-white p-3 flex-shrink-0 ${sidebarOpen ? 'd-block' : 'd-none'}`} 
@@ -13,8 +15,17 @@ const DepartmentLeftNav = ({ sidebarOpen }) => {
       </div>
       
       <nav className="nav flex-column gap-2">
-        <Link to="/DepartmentDashboard" className="nav-link text-white rounded bg-warning bg-opacity-25 shadow-sm">
+        <Link 
+          to="/DepartmentDashboard" 
+          className={`nav-link text-white rounded ${location.pathname === '/DepartmentDashboard' ? 'bg-warning bg-opacity-25 shadow-sm active fw-bold' : 'opacity-75'}`}
+        >
           <i className="bi bi-speedometer2 me-2"></i> Department Dashboard
+        </Link>
+        <Link 
+          to="/AddWork" 
+          className={`nav-link text-white rounded ${location.pathname === '/AddWork' ? 'bg-warning bg-opacity-25 shadow-sm active fw-bold' : 'opacity-75'}`}
+        >
+          <i className="bi bi-plus-square me-2"></i> Add/Manage Works
         </Link>
         <Link to="#" className="nav-link text-white rounded opacity-75">
           <i className="bi bi-envelope-paper me-2"></i> My Requests

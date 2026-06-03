@@ -90,6 +90,7 @@ export function AuthProvider({ children }) {
   const [refreshToken, setRefreshToken] = useState(null);
   const [role, setRole] = useState(null);
   const [uniqueId, setUniqueId] = useState(null);
+  const [departmentId, setDepartmentId] = useState(null);
   const [isReady, setIsReady] = useState(false);
 
   // Restore auth state from localStorage on mount
@@ -103,6 +104,7 @@ export function AuthProvider({ children }) {
         setRefreshToken(parsed.refresh || null);
         setRole(parsed.role || null);
         setUniqueId(parsed.unique_id || null);
+        setDepartmentId(parsed.department_id || null);
       } catch (err) {
         console.error('Failed to parse auth data:', err);
         localStorage.removeItem(STORAGE_KEY);
@@ -120,12 +122,13 @@ export function AuthProvider({ children }) {
         refresh: refreshToken,
         role,
         unique_id: uniqueId,
+        department_id: departmentId,
       };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(authData));
     } else {
       localStorage.removeItem(STORAGE_KEY);
     }
-  }, [user, accessToken, refreshToken, role, uniqueId]);
+  }, [user, accessToken, refreshToken, role, uniqueId, departmentId]);
 
   const login = (data) => {
     setUser(data.user);
@@ -133,6 +136,7 @@ export function AuthProvider({ children }) {
     setRefreshToken(data.refresh);
     setRole(data.role);
     setUniqueId(data.unique_id);
+    setDepartmentId(data.department_id);
   };
 
   const logout = () => {
@@ -141,6 +145,7 @@ export function AuthProvider({ children }) {
     setRefreshToken(null);
     setRole(null);
     setUniqueId(null);
+    setDepartmentId(null);
     localStorage.removeItem(STORAGE_KEY);
   };
 
@@ -166,12 +171,13 @@ export function AuthProvider({ children }) {
     refreshToken,
     role,
     uniqueId,
+    departmentId,
     login,
     logout,
     refreshAccessToken,
     isAuthenticated: !!accessToken,
     isReady,
-  }), [user, accessToken, refreshToken, role, uniqueId, isReady]);
+  }), [user, accessToken, refreshToken, role, uniqueId, departmentId, isReady]);
 
   return (
     <AuthContext.Provider value={value}>
