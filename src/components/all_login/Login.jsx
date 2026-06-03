@@ -25,19 +25,19 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+  const [departments, setDepartments] = useState([]);
 
-  const departmentList = [
-    { name: "Agriculture", label: "Agriculture (कृषि विभाग)" },
-    { name: "Horticulture", label: "Horticulture (उद्यान विभाग)" },
-    { name: "Animal Husbandry", label: "Animal Husbandry (पशु पालन विभाग)" },
-    { name: "Education", label: "Education (शिक्षा विभाग)" },
-    { name: "Health", label: "Health (स्वास्थ्य विभाग)" },
-    { name: "Revenue", label: "Revenue (राजस्व विभाग)" },
-    { name: "Social Welfare", label: "Social Welfare (समाज कल्याण विभाग)" },
-    { name: "Irrigation", label: "Irrigation (सिंचाई विभाग)" },
-    { name: "PWD", label: "PWD (लोक निर्माण विभाग)" },
-    { name: "Development", label: "Development (विकास विभाग)" }
-  ];
+  useEffect(() => {
+    const fetchDepartments = async () => {
+      try {
+        const response = await axios.get(`${API_BASE_URL}/departments/`);
+        setDepartments(response.data);
+      } catch (err) {
+        console.error("Failed to fetch departments:", err);
+      }
+    };
+    fetchDepartments();
+  }, []);
 
   const navigate = useNavigate();
   const { login, isAuthenticated, role: authRole } = useAuth();
@@ -147,8 +147,10 @@ const Login = () => {
                     required
                   >
                     <option value="">Select Department</option>
-                    {departmentList.map((dept) => (
-                      <option key={dept.name} value={dept.name}>{dept.label}</option>
+                    {departments.map((dept) => (
+                      <option key={dept.id} value={dept.name_en}>
+                        {dept.name_en} ({dept.name_hi})
+                      </option>
                     ))}
                   </select>
                 ) : (
