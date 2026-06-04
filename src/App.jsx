@@ -13,13 +13,8 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 
 import Home from './components/pages/Home';
 import { AuthProvider } from './components/all_login/AuthContext';
-import SupervisorDashBoard from "./components/supervisor_panel/SupervisorDashBoard";
 import NavBar from './components/nav_bar/NavBar';
 import Login from "./components/all_login/Login";
-import DPODashboard from "./components/DPO_panel/DPODashboard";
-import AnganwadiDashboard from "./components/anganwadi_panel/AnganwadiDashboard";
-import CDPODashboard from "./components/CDPO_panel/CDPODashboard";
-import DirectorDashboard from "./components/director_panel/DirectorDashboard";
 import About from './components/pages/About';
 import PhotoGallery from './components/pages/PhotoGallery'; // Import the new component
 import ProtectedRoute from "./components/all_login/ProtectedRoute";
@@ -34,11 +29,6 @@ function AppContent() {
   const location = useLocation();
 
   const hideNavbarRoutes = [
-    "/SupervisorDashBoard", 
-    "/DPODashBoard", 
-    "/AnganwadiDashBoard", 
-    "/CDPODashBoard", 
-    "/DirectorDashboard",
     "/AdminDashboard",
     "/ITCellDashboard",
     "/DepartmentDashboard",
@@ -56,11 +46,6 @@ function AppContent() {
           <Route path="/about" element={<About />} />
           
           {/* Protected Routes */}
-          <Route path="/SupervisorDashBoard" element={<ProtectedRoute allowedRoles={['supervisor']}><SupervisorDashBoard /></ProtectedRoute>} />
-          <Route path="/DPODashBoard" element={<ProtectedRoute allowedRoles={['dpo']}><DPODashboard /></ProtectedRoute>} />
-          <Route path="/AnganwadiDashBoard" element={<ProtectedRoute allowedRoles={['anganwadi']}><AnganwadiDashboard /></ProtectedRoute>} />
-          <Route path="/CDPODashBoard" element={<ProtectedRoute allowedRoles={['cdpo']}><CDPODashboard /></ProtectedRoute>} />
-          <Route path="/DirectorDashboard" element={<ProtectedRoute allowedRoles={['director']}><DirectorDashboard /></ProtectedRoute>} />
           <Route path="/AddWork" element={<ProtectedRoute allowedRoles={['department', 'it_cell', 'admin']}><AddWork /></ProtectedRoute>} />
           <Route path="/AddWorkDetails" element={<ProtectedRoute allowedRoles={['department']}><AddWorkDetails /></ProtectedRoute>} />
           <Route path="/AdminDashboard" element={<ProtectedRoute allowedRoles={['admin']}><AdminDashboard /></ProtectedRoute>} />
