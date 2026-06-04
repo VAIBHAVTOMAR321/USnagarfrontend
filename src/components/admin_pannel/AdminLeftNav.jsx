@@ -14,7 +14,7 @@ const AdminLeftNav = ({ sidebarOpen }) => {
         <h4 className="m-0 fw-bold">Admin Panel</h4>
       </div>
       
-      <nav className="nav flex-column gap-2">
+      <nav className="nav flex-column gap-2 align-items-start">
         <Link 
           to="/AdminDashboard" 
           className={`nav-link text-white rounded ${location.pathname === '/AdminDashboard' ? 'bg-primary bg-opacity-25 shadow-sm active fw-bold' : 'opacity-75'}`}

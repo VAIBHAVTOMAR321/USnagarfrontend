@@ -27,6 +27,12 @@ const DepartmentLeftNav = ({ sidebarOpen }) => {
         >
           <i className="bi bi-plus-square me-2"></i> Add/Manage Works
         </Link>
+        <Link 
+          to="/AddWorkDetails" 
+          className={`nav-link text-white rounded ${location.pathname === '/AddWorkDetails' ? 'bg-warning bg-opacity-25 shadow-sm active fw-bold' : 'opacity-75'}`}
+        >
+          <i className="bi bi-file-earmark-plus me-2"></i> Add Work Details
+        </Link>
         <Link to="#" className="nav-link text-white rounded opacity-75">
           <i className="bi bi-envelope-paper me-2"></i> My Requests
         </Link>

@@ -37,6 +37,12 @@ const AddWork = () => {
     work_name: ''
   });
 
+  // Progress Details Expansion State
+  const [expandedWorkId, setExpandedWorkId] = useState(null);
+  const [workProgressDetails, setWorkProgressDetails] = useState(null);
+  const [workProgressImages, setWorkProgressImages] = useState([]);
+  const [loadingProgress, setLoadingProgress] = useState(false);
+
   // Edit Modal State
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingWork, setEditingWork] = useState(null);
@@ -106,6 +112,37 @@ const AddWork = () => {
       fetchWorks();
     }
   }, [departmentId, accessToken, role]);
+
+  const handleToggleProgress = async (work) => {
+    if (expandedWorkId === work.work_id) {
+      setExpandedWorkId(null);
+      return;
+    }
+
+    setExpandedWorkId(work.work_id);
+    setLoadingProgress(true);
+    setWorkProgressDetails(null);
+    setWorkProgressImages([]);
+
+    try {
+      // Fetch financial/physical details
+      const detailsRes = await axios.get(`${API_BASE_URL}/work-details/?work_id=${work.work_id}`, {
+        headers: { Authorization: `Bearer ${accessToken}` }
+      });
+      const details = Array.isArray(detailsRes.data) ? detailsRes.data.find(d => d.work_id === work.work_id) : (detailsRes.data?.work_id === work.work_id ? detailsRes.data : null);
+      setWorkProgressDetails(details);
+
+      // Fetch images
+      const imagesRes = await axios.get(`${API_BASE_URL}/work-images/?work_id=${work.work_id}`, {
+        headers: { Authorization: `Bearer ${accessToken}` }
+      });
+      setWorkProgressImages(imagesRes.data || []);
+    } catch (err) {
+      console.error("Error fetching progress details:", err);
+    } finally {
+      setLoadingProgress(false);
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -379,7 +416,8 @@ const AddWork = () => {
                     </thead>
                     <tbody style={{ fontSize: '0.85rem', color: '#334155' }}>
                       {works.map((work) => (
-                      <tr key={work.id}>
+                      <React.Fragment key={work.id}>
+                      <tr className={expandedWorkId === work.work_id ? 'table-primary-subtle' : ''}>
                         <td className="px-4"><span className="badge bg-slate-100 text-slate-700 border fw-medium" style={{ backgroundColor: '#F1F5F9', color: '#475569' }}>{work.work_id}</span></td>
                         <td className="text-truncate fw-bold" style={{ maxWidth: '120px', color: '#4F46E5' }}>
                           {work.department_name_en || 
@@ -398,6 +436,9 @@ const AddWork = () => {
                           <Button variant="link" size="sm" className="text-info p-0 me-2 shadow-none opacity-75 hover-opacity-100" title="View Details" onClick={() => handleViewClick(work)}>
                             <i className="bi bi-eye"></i>
                           </Button>
+                          <Button variant="link" size="sm" className="text-success p-0 me-2 shadow-none opacity-75 hover-opacity-100" title="View Progress Details" onClick={() => handleToggleProgress(work)}>
+                            <i className={`bi ${expandedWorkId === work.work_id ? 'bi-chevron-up' : 'bi-journal-text'}`}></i>
+                          </Button>
                           {role !== 'admin' && (
                             <>
                             <Button variant="link" size="sm" className="text-primary p-0 me-2 shadow-none opacity-75 hover-opacity-100" onClick={() => handleEditClick(work)}>
@@ -410,6 +451,87 @@ const AddWork = () => {
                           )}
                         </td>
                       </tr>
+                      {expandedWorkId === work.work_id && (
+                        <tr>
+                          <td colSpan={11} className="bg-light p-3">
+                            <div className="animate-fade-in border rounded p-4 bg-white shadow-sm">
+                              <div className="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
+                                <h6 className="fw-bold m-0 text-primary">
+                                  <i className="bi bi-graph-up-arrow me-2"></i>
+                                  Project Progress Details — {work.work_id}
+                                </h6>
+                                <Button variant="light" size="sm" className="rounded-circle border" onClick={() => setExpandedWorkId(null)}>
+                                  <i className="bi bi-x"></i>
+                                </Button>
+                              </div>
+
+                              {loadingProgress ? (
+                                <div className="text-center py-4"><Spinner animation="border" size="sm" /></div>
+                              ) : workProgressDetails ? (
+                                <Row className="g-4">
+                                  <Col md={8}>
+                                    <div className="mb-4">
+                                      <p className="text-muted small fw-bold text-uppercase mb-3"><i className="bi bi-cash-stack me-1"></i> Financial Overview</p>
+                                      <Row className="g-2 text-center">
+                                        {[
+                                          { label: 'Sanction Date', value: workProgressDetails.sanction_date },
+                                          { label: 'Est. Cost', value: `₹${workProgressDetails.estimated_cost}L` },
+                                          { label: 'Approved Outlay', value: `₹${workProgressDetails.approved_outlay}L` },
+                                          { label: 'Released', value: `₹${workProgressDetails.released_amount}L` }
+                                        ].map((stat, i) => (
+                                          <Col xs={3} key={i}>
+                                            <div className="p-2 border rounded bg-light">
+                                              <div className="fw-bold text-dark small">{stat.value}</div>
+                                              <div className="text-muted" style={{ fontSize: '0.65rem' }}>{stat.label}</div>
+                                            </div>
+                                          </Col>
+                                        ))}
+                                      </Row>
+                                    </div>
+                                    <div>
+                                      <p className="text-muted small fw-bold text-uppercase mb-3"><i className="bi bi-geo-alt me-1"></i> Physical Progress</p>
+                                      <Row className="g-2">
+                                        <Col md={4}><span className="small text-muted">Start Date:</span> <span className="small fw-bold">{workProgressDetails.work_start_date}</span></Col>
+                                        <Col md={4}><span className="small text-muted">Target:</span> <span className="small fw-bold">{workProgressDetails.physical_target} {workProgressDetails.unit}</span></Col>
+                                        <Col md={4}><span className="small text-muted">Coordinates:</span> <span className="small fw-bold">{workProgressDetails.latitude}, {workProgressDetails.longitude}</span></Col>
+                                      </Row>
+                                    </div>
+                                  </Col>
+                                  <Col md={4} className="border-start">
+                                    <p className="text-muted small fw-bold text-uppercase mb-3"><i className="bi bi-images me-1"></i> Progress Images</p>
+                                    <Row className="g-2">
+                                      {[1, 2, 3, 4].map(phase => {
+                                        const img = workProgressImages.find(i => i.phase_number === phase);
+                                        return (
+                                          <Col xs={6} key={phase}>
+                                            <div 
+                                              className="border rounded ratio ratio-4x3 bg-light overflow-hidden position-relative group"
+                                              style={{ cursor: img ? 'pointer' : 'default' }}
+                                              onClick={() => img && window.open(img.image_url, '_blank')}
+                                            >
+                                              {img ? (
+                                                <img src={img.image_url} alt={`Phase ${phase}`} className="object-fit-cover" />
+                                              ) : (
+                                                <div className="d-flex align-items-center justify-content-center text-muted small opacity-50">Phase {phase}</div>
+                                              )}
+                                              <div className="position-absolute bottom-0 start-0 w-100 bg-dark bg-opacity-50 text-white text-center" style={{ fontSize: '0.6rem' }}>P{phase}</div>
+                                            </div>
+                                          </Col>
+                                        );
+                                      })}
+                                    </Row>
+                                  </Col>
+                                </Row>
+                              ) : (
+                                <div className="text-center py-4 text-muted fst-italic">
+                                  <i className="bi bi-exclamation-circle me-1"></i> No details present for this work.
+                                </div>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                      </React.Fragment>
                       ))}
                     </tbody>
                   </Table>

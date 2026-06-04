@@ -29,6 +29,7 @@ import DepartmentDashboard from "./components/department_pannel/DepartmentDashbo
 import AdminLeftNav from "./components/admin_pannel/AdminLeftNav"; // Import AdminLeftNav
 import DepartmentDetailsManagement from "./components/it_cell_pannel/DepartmentDetailsManagement";
 import AddWork from "./components/department_pannel/AddWork";
+import AddWorkDetails from "./components/department_pannel/AddWorkDetails";
 function AppContent() {
   const location = useLocation();
 
@@ -43,6 +44,7 @@ function AppContent() {
     "/DepartmentDashboard",
     "/ITCell/DepartmentDetails",
     "/AddWork",
+    "/AddWorkDetails",
   ];
   const shouldHideNavbar = hideNavbarRoutes.includes(location.pathname);
 
@@ -60,6 +62,7 @@ function AppContent() {
           <Route path="/CDPODashBoard" element={<ProtectedRoute allowedRoles={['cdpo']}><CDPODashboard /></ProtectedRoute>} />
           <Route path="/DirectorDashboard" element={<ProtectedRoute allowedRoles={['director']}><DirectorDashboard /></ProtectedRoute>} />
           <Route path="/AddWork" element={<ProtectedRoute allowedRoles={['department', 'it_cell', 'admin']}><AddWork /></ProtectedRoute>} />
+          <Route path="/AddWorkDetails" element={<ProtectedRoute allowedRoles={['department']}><AddWorkDetails /></ProtectedRoute>} />
           <Route path="/AdminDashboard" element={<ProtectedRoute allowedRoles={['admin']}><AdminDashboard /></ProtectedRoute>} />
           <Route path="/ITCellDashboard" element={<ProtectedRoute allowedRoles={['it_cell']}><ITCellDashboard /></ProtectedRoute>} />
           <Route path="/DepartmentDashboard" element={<ProtectedRoute allowedRoles={['department']}><DepartmentDashboard /></ProtectedRoute>} />
