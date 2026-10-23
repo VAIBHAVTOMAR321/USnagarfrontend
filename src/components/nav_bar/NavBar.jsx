@@ -45,7 +45,7 @@ function NavBar() {
             <Nav.Link as={Link} to="/gallery" style={{ color: '#008080', fontWeight: '500', padding: '0 15px' }} onClick={() => setExpanded(false)}>
               Gallery
             </Nav.Link>
-            <Nav.Link as={Link} to="/contact" style={{ color: '#008080', fontWeight: '500', padding: '0 15px' }} onClick={() => setExpanded(false)}>
+            <Nav.Link as={Link} to="/ContactUs" style={{ color: '#008080', fontWeight: '500', padding: '0 15px' }} onClick={() => setExpanded(false)}>
               Contact Us
             </Nav.Link>
 

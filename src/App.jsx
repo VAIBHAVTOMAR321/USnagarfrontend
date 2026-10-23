@@ -27,6 +27,7 @@ import AddWork from "./components/department_pannel/AddWork";
 import AddWorkDetails from "./components/department_pannel/AddWorkDetails";
 import AdminDepartmentAnalytics from "./components/admin_pannel/AdminDepartmentAnalytics";
 import Footer from "./components/footer/Footer";
+import ContactUs from "./components/pages/ContactUs";
 function AppContent() {
   const location = useLocation();
 
@@ -67,6 +68,7 @@ function AppContent() {
           <Route path="/DepartmentDashboard" element={<ProtectedRoute allowedRoles={['department']}><DepartmentDashboard /></ProtectedRoute>} />
           <Route path="/ITCell/DepartmentDetails" element={<ProtectedRoute allowedRoles={['it_cell']}><DepartmentDetailsManagement /></ProtectedRoute>} />  
           <Route path="/Login" element={<Login />} />
+          <Route path="/ContactUs" element={<ContactUs />} />
           <Route path="/gallery" element={<PhotoGallery />} /> {/* Add a new route for the gallery */}
           
         </Routes>
