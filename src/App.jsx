@@ -78,7 +78,7 @@ function AppContent() {
 function App() {
   return (
     <AuthProvider>
-      <Router>
+      <Router basename="/pauripargati">
         <AppContent />
       </Router>
     </AuthProvider>
