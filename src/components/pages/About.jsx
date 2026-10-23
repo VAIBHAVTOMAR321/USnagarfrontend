@@ -17,7 +17,7 @@ export const AboutSection = ({ isPreview = false }) => {
         <div className="about-image-wrapper">
           <img 
             src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1200&q=80" 
-            alt="Lush Landscape of Udham Singh Nagar" 
+            alt="Lush Landscape of Pauri" 
             className="img-fluid about-hero-img rounded shadow-sm"
           />
         </div>
@@ -87,7 +87,7 @@ const About = () => {
             <h2 className="section-title-large mb-1 text-navy">OUR DEPARTMENTS</h2>
             <h5 className="mb-3 text-cyan" style={{ letterSpacing: '1px' }}>District Departments Overview</h5>
             <p className="text-muted mx-auto" style={{ maxWidth: '800px' }}>
-              Access vital information and digital services provided by the various local government departments dedicated to the welfare and growth of Udham Singh Nagar.
+              Access vital information and digital services provided by the various local government departments dedicated to the welfare and growth of Pauri.
             </p>
           </div>
           <Row className="g-4">

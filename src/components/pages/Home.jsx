@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Container, Row, Col, Card } from 'react-bootstrap';
 import { AboutSection } from './About';
 import { GALLERY_IMAGES } from './PhotoGallery';
+import CM from  "../../assets/images/final_banner_cm.jpeg"
 import '../../assets/css/home.css'
 
 // Photo Gallery Carousel Component
@@ -34,7 +35,7 @@ const HomePhotoGalleryCarousel = () => {
   }, [scrollPosition]);
 
   const handleGalleryClick = () => {
-    window.location.href = '/gallery';
+    window.location.href = '/pauripargati/gallery';
   };
 
   const scrollLeft = () => {
@@ -118,10 +119,10 @@ function Home() {
   };
 
   const content = {
-    districtName: "Udham Singh Nagar",
-    heroTitle: "Welcome to Udham Singh Nagar",
+    districtName: "Pauri",
+    heroTitle: "Welcome to Pauri",
     heroSubtitle: "The Food Bowl of Uttarakhand — A harmonious blend of industrial growth, agricultural excellence, and rich cultural heritage.",
-    glanceTitle: "US Nagar at a Glance",
+    glanceTitle: "Pauri Garhwal at a Glance",
     glanceSubtitle: "A snapshot of our district's geography and demographics",
     stats: [
       { label: "Area", value: "2,542 Sq. Km.", icon: "bi-geo-alt", color: "blue" },
@@ -178,14 +179,14 @@ function Home() {
             </Col>
             <Col lg={6} className="animate__animated animate__fadeInRight">
               <div className="hero-image-wrapper shadow-lg">
-                <img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1200&q=80" alt="Scenic Udham Singh Nagar" className="img-fluid rounded-3" />
+                <img src={CM} alt="images" />
               </div>
             </Col>
           </Row>
         </Container>
       </header>
 
-      {/* US Nagar At a Glance Dashboard */}
+      {/* PauriAt a Glance Dashboard */}
       <section className="glance-section py-5 bg-white">
         <Container>
           <div className="text-center mb-5">

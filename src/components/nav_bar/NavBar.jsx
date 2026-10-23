@@ -27,7 +27,7 @@ function NavBar() {
             style={{ height: '60px', width: 'auto', marginRight: '12px' }}
           />
           <div className="d-flex flex-column lh-sm">
-            <span style={{ color: '#000080', fontWeight: '700', fontSize: '1.1rem' }}>नियोजन विभाग ऊधमसिंह नगर</span>
+            <span style={{ color: '#000080', fontWeight: '700', fontSize: '1.1rem' }}>नियोजन विभाग पौड़ी</span>
             <span style={{ color: '#d9534f', fontWeight: '600', fontSize: '0.9rem', letterSpacing: '0.5px' }}>Planning Department</span>
           </div>
         </Navbar.Brand>
@@ -56,7 +56,7 @@ function NavBar() {
               style={{ backgroundColor: '#008080', border: 'none', color: '#ffffff', fontWeight: '600', fontSize: '0.9rem' }}
               onClick={() => setExpanded(false)}
             >
-              Admin
+              Login
             </Button>
           </Nav>
         </Navbar.Collapse>

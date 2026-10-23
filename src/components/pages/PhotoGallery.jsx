@@ -30,11 +30,11 @@ export const GalleryIntro = () => {
       <Col lg={7} className="ps-lg-5 animate__animated animate__fadeInRight">
         <div className="about-content-wrapper">
           <h2 className="about-main-heading fw-bold text-navy">
-            <span className="text-cyan">VISUAL JOURNEY —</span> Capturing the Essence of US Nagar
+            <span className="text-cyan">VISUAL JOURNEY —</span> Capturing the Essence of Pauri
           </h2>
           <div className="about-para-group">
             <p>
-              Explore the vibrant culture, lush landscapes, and developmental milestones of Udham Singh Nagar through our curated photo collection. Each image tells a story of progress, tradition, and community.
+              Explore the vibrant culture, lush landscapes, and developmental milestones of Pauri through our curated photo collection. Each image tells a story of progress, tradition, and community.
             </p>
             <p className="text-muted mt-3">
               Our gallery is updated regularly to reflect the changing seasons and the evolving spirit of our district.

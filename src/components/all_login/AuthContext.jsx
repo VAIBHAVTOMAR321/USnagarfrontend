@@ -123,7 +123,7 @@ export function AuthProvider({ children }) {
               setUniqueId(null);
               setDepartmentId(null);
               if (window.location.pathname !== '/Login') {
-                window.location.href = '/Login';
+                window.location.href = '/pauripargati/Login';
               }
             }
           } else {
@@ -176,7 +176,7 @@ export function AuthProvider({ children }) {
     localStorage.clear();
     // Force redirect to login page
     if (window.location.pathname !== '/Login') {
-      window.location.href = '/Login';
+      window.location.href = '/pauripargati/Login';
     }
   }, []);
 

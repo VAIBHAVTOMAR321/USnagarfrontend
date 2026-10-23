@@ -9,13 +9,13 @@ import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
 const ROLE_DASHBOARD_MAP = {
   admin: '/AdminDashboard',
-  it_cell: '/ITCellDashboard',
-  department: '/DepartmentDashboard',
-  supervisor: '/SupervisorDashBoard',
-  dpo: '/DPODashBoard',
-  cdpo: '/CDPODashBoard',
-  director: '/DirectorDashboard',
-  anganwadi: '/AnganwadiDashBoard',
+  // it_cell: '/ITCellDashboard',
+  // department: '/DepartmentDashboard',
+  // supervisor: '/SupervisorDashBoard',
+  // dpo: '/DPODashBoard',
+  // cdpo: '/CDPODashBoard',
+  // director: '/DirectorDashboard',
+  // anganwadi: '/AnganwadiDashBoard',
 };
 
 const Login = () => {
@@ -115,9 +115,9 @@ const Login = () => {
         <div className="panel-right">
           
           <div className="role-selector-section mb-4">
-            <p className="role-selector-title small mb-2 fw-bold text-uppercase tracking-wider">Select Role</p>
+            <p className="role-selector-title small mb-2 fw-bold text-uppercase tracking-wider">Login</p>
             <div className="role-radio-group">
-              {['admin', 'it_cell', 'department'].map((r) => (
+              {['admin',].map((r) => (
                 <label key={r} className={`role-label-custom ${role === r ? 'active' : ''}`}>
                   <input 
                     type="radio" 
@@ -200,7 +200,7 @@ const Login = () => {
       </div>
 
       <footer className="login-footer-text">
-        © 2026 US Nagar District Portal. Developed by ZEE
+        © 2026 PauriDistrict Portal. Developed by ZEE
       </footer>
     </div>
   );
