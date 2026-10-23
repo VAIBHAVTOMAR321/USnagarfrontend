@@ -26,6 +26,7 @@ import DepartmentDetailsManagement from "./components/it_cell_pannel/DepartmentD
 import AddWork from "./components/department_pannel/AddWork";
 import AddWorkDetails from "./components/department_pannel/AddWorkDetails";
 import AdminDepartmentAnalytics from "./components/admin_pannel/AdminDepartmentAnalytics";
+import Footer from "./components/footer/Footer";
 function AppContent() {
   const location = useLocation();
 
@@ -39,6 +40,16 @@ function AppContent() {
     "/Admin/Analytics",
   ];
   const shouldHideNavbar = hideNavbarRoutes.includes(location.pathname);
+  const hideFooterRoutes = [
+    "/AdminDashboard",
+    "/ITCellDashboard",
+    "/DepartmentDashboard",
+    "/ITCell/DepartmentDetails",
+    "/AddWork",
+    "/AddWorkDetails",
+    "/Admin/Analytics",
+  ];
+  const shouldHideFooter = hideNavbarRoutes.includes(location.pathname);
 
   return (
     <>
@@ -59,6 +70,7 @@ function AppContent() {
           <Route path="/gallery" element={<PhotoGallery />} /> {/* Add a new route for the gallery */}
           
         </Routes>
+           {!shouldHideFooter && <Footer />}
     </>
   );
 }

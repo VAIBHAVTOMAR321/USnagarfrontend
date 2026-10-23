@@ -1,0 +1,247 @@
+/* ===================== Footer styles ===================== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.site-footer {
+  background-color: #1a1a1a;
+  color: #cccccc;
+  padding: 60px 0 0;
+  font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  position: relative;
+}
+
+.footer-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 40px;
+  display: grid;
+  grid-template-columns: 2fr 1fr 1.5fr;
+  gap: 40px;
+  padding-bottom: 50px;
+}
+
+/* ---------- Brand column ---------- */
+.footer-brand .brand-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.brand-icon {
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  color: #ffffff;
+}
+
+.brand-title h3 {
+  font-family: 'Playfair Display', Georgia, 'Times New Roman', serif;
+  font-size: 26px;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 0.5px;
+}
+
+.footer-brand p {
+  font-size: 14px;
+  line-height: 1.7;
+  color: #b0b0b0;
+  max-width: 420px;
+  text-align: justify;
+}
+
+/* ---------- Column headings ---------- */
+.footer-col h4 {
+  font-family: 'Playfair Display', Georgia, 'Times New Roman', serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 22px;
+  position: relative;
+  padding-bottom: 10px;
+}
+
+.footer-col h4::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 40px;
+  height: 2px;
+  background-color: #00bcd4;
+}
+
+/* ---------- Quick links ---------- */
+.footer-links {
+  list-style: none;
+}
+
+.footer-links li {
+  margin-bottom: 12px;
+}
+
+.footer-links a {
+  color: #cccccc;
+  text-decoration: none;
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  transition: color 0.25s ease, padding-left 0.25s ease;
+}
+
+.footer-links a .arrow-icon {
+  width: 14px;
+  height: 14px;
+  margin-right: 10px;
+  color: #777;
+  transition: color 0.25s ease, transform 0.25s ease;
+  vertical-align: middle;
+}
+
+.footer-links a:hover {
+  color: #00bcd4;
+  padding-left: 4px;
+}
+
+.footer-links a:hover .arrow-icon {
+  color: #00bcd4;
+  transform: translateX(3px);
+}
+
+/* ---------- Contact info ---------- */
+.footer-contact {
+  list-style: none;
+}
+
+.footer-contact li {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 16px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #b0b0b0;
+}
+
+.footer-contact .icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: #00bcd4;
+}
+
+.footer-contact a {
+  color: #b0b0b0;
+  text-decoration: none;
+  transition: color 0.25s ease;
+}
+
+.footer-contact a:hover {
+  color: #00bcd4;
+}
+
+/* ---------- Copyright bar ---------- */
+.footer-bottom {
+  background-color: #111111;
+  border-top: 1px solid #2a2a2a;
+  padding: 18px 40px;
+}
+
+.footer-bottom-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.footer-bottom p {
+  font-size: 13px;
+  color: #888;
+}
+
+.footer-bottom a {
+  color: #00bcd4;
+  text-decoration: none;
+  transition: color 0.25s ease;
+}
+
+.footer-bottom a:hover {
+  text-decoration: underline;
+}
+
+/* ---------- Back to top button ---------- */
+.back-to-top {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background-color: #00bcd4;
+  color: #ffffff;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 20px rgba(0, 188, 212, 0.45);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px);
+  transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease, background-color 0.25s ease;
+  z-index: 999;
+}
+
+.back-to-top.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.back-to-top:hover {
+  background-color: #0097a7;
+}
+
+.back-to-top svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 900px) {
+  .footer-container {
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+  }
+  .footer-brand {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 600px) {
+  .footer-container {
+    grid-template-columns: 1fr;
+    padding: 0 20px;
+  }
+  .footer-bottom {
+    padding: 18px 20px;
+  }
+  .footer-bottom-inner {
+    flex-direction: column;
+    text-align: center;
+  }
+  .back-to-top {
+    bottom: 20px;
+    right: 20px;
+    width: 42px;
+    height: 42px;
+  }
+}

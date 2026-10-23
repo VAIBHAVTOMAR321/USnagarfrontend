@@ -131,7 +131,7 @@ function Home() {
       { label: "Municipalities", value: "09", icon: "bi-building-check", color: "purple" },
       { label: "Villages", value: "672", icon: "bi-house-heart", color: "teal" }
     ],
-    copyright: `© ${new Date().getFullYear()} District Administration, Udham Singh Nagar. All rights reserved.`
+   
   };
 
   return (
@@ -229,14 +229,7 @@ function Home() {
         </Container>
       </section>
 
-      {/* Streamlined Footer */}
-      <footer className="gov-footer py-4 mt-auto">
-        <Container>
-          <div className="text-center">
-            <p className="small opacity-75 mb-0">{content.copyright}</p>
-          </div>
-        </Container>
-      </footer>
+    
 
       {/* Floating Back to Top Button */}
       {showScroll && (
