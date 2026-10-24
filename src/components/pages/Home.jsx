@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Container, Row, Col, Card } from 'react-bootstrap';
+import axios from 'axios';
 import { AboutSection } from './About';
 import { GALLERY_IMAGES } from './PhotoGallery';
 import CM from  "../../assets/images/final_banner_cm.jpeg"
+import { API_BASE_URL } from '../../apiConfig';
 import '../../assets/css/home.css'
 
 // Photo Gallery Carousel Component
@@ -100,6 +102,22 @@ const HomePhotoGalleryCarousel = () => {
 
 function Home() {
   const [showScroll, setShowScroll] = useState(false);
+  const [carouselData, setCarouselData] = useState([]);
+
+  useEffect(() => {
+    const fetchCarousel = async () => {
+      try {
+        const res = await axios.get(`${API_BASE_URL}/carousel/`);
+        const data = Array.isArray(res.data) ? res.data : res.data?.data || res.data?.results || [];
+        setCarouselData(data);
+      } catch (e) {
+        setCarouselData([]);
+      }
+    };
+    fetchCarousel();
+  }, []);
+
+  const heroItem = carouselData.length > 0 ? carouselData[0] : null;
 
   useEffect(() => {
     const checkScrollTop = () => {
@@ -120,8 +138,8 @@ function Home() {
 
   const content = {
     districtName: "Pauri",
-    heroTitle: "Welcome to Pauri",
-    heroSubtitle: "The Food Bowl of Uttarakhand — A harmonious blend of industrial growth, agricultural excellence, and rich cultural heritage.",
+    heroTitle: heroItem?.title || "Welcome to Pauri",
+    heroSubtitle: heroItem?.description || "The Food Bowl of Uttarakhand — A harmonious blend of industrial growth, agricultural excellence, and rich cultural heritage.",
     glanceTitle: "Pauri Garhwal at a Glance",
     glanceSubtitle: "A snapshot of our district's geography and demographics",
     stats: [
