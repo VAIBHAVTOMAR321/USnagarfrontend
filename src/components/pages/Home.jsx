@@ -149,6 +149,7 @@ const HomePhotoGalleryCarousel = () => {
 function Home() {
   const [showScroll, setShowScroll] = useState(false);
   const [carouselData, setCarouselData] = useState([]);
+  const [carouselIndex, setCarouselIndex] = useState(0);
 
   useEffect(() => {
     const fetchCarousel = async () => {
@@ -163,7 +164,15 @@ function Home() {
     fetchCarousel();
   }, []);
 
-  const heroItem = carouselData.length > 0 ? carouselData[0] : null;
+  useEffect(() => {
+    if (carouselData.length <= 1) return;
+    const id = setInterval(() => {
+      setCarouselIndex((i) => (i + 1) % carouselData.length);
+    }, 3000);
+    return () => clearInterval(id);
+  }, [carouselData.length]);
+
+  const heroItem = carouselData.length > 0 ? carouselData[carouselIndex % carouselData.length] : null;
 
   useEffect(() => {
     const checkScrollTop = () => {
@@ -242,8 +251,24 @@ function Home() {
               </div>
             </Col>
             <Col lg={6} className="animate__animated animate__fadeInRight">
-              <div className="hero-image-wrapper shadow-lg">
+              <div className="hero-image-wrapper shadow-lg position-relative">
                 <img src={heroItem?.image ? getImageUrl(heroItem.image) : CM} alt="images" />
+                {carouselData.length > 1 && (
+                  <>
+                    <button
+                      className="btn btn-sm btn-light position-absolute top-50 start-0 translate-middle-y"
+                      onClick={() => setCarouselIndex((i) => (i - 1 + carouselData.length) % carouselData.length)}
+                    >
+                      ‹
+                    </button>
+                    <button
+                      className="btn btn-sm btn-light position-absolute top-50 end-0 translate-middle-y"
+                      onClick={() => setCarouselIndex((i) => (i + 1) % carouselData.length)}
+                    >
+                      ›
+                    </button>
+                  </>
+                )}
               </div>
             </Col>
           </Row>
