@@ -30,6 +30,7 @@ import AddWorkDetails from "./components/department_pannel/AddWorkDetails";
 import Footer from "./components/footer/Footer";
 import ContactUs from "./components/pages/ContactUs";
 import AddDemartment from "./components/admin_pannel/AddDemartment";
+import ContactQuery from "./components/admin_pannel/ContactQuery";
 function AppContent() {
   const location = useLocation();
 
@@ -42,7 +43,8 @@ function AppContent() {
     "/AddWorkDetails",
     "/GalleryManagement",
     "/AboutUsManagement",
-    "/AddDemartment"
+    "/AddDemartment",
+    "/ContactQuery"
   ];
   const shouldHideNavbar = hideNavbarRoutes.includes(location.pathname);
   const hideFooterRoutes = [
@@ -54,7 +56,8 @@ function AppContent() {
     "/AddWorkDetails",
     "/GalleryManagement",
     "/AboutUsManagement",
-    "/AddDemartment"
+    "/AddDemartment",
+    "/ContactQuery"
   ];
   const shouldHideFooter = hideNavbarRoutes.includes(location.pathname);
 
@@ -70,6 +73,7 @@ function AppContent() {
           <Route path="/AddWorkDetails" element={<ProtectedRoute allowedRoles={['department']}><AddWorkDetails /></ProtectedRoute>} />
           <Route path="/AdminDashboard" element={<ProtectedRoute allowedRoles={['admin']}><AdminDashboard /></ProtectedRoute>} />
                     <Route path="/AddDemartment" element={<ProtectedRoute allowedRoles={['admin']}><AddDemartment /></ProtectedRoute>} />
+          <Route path="/ContactQuery" element={<ProtectedRoute allowedRoles={['admin']}><ContactQuery /></ProtectedRoute>} />
           <Route path="/GalleryManagement" element={<ProtectedRoute allowedRoles={['admin']}><GalleryManagement /></ProtectedRoute>} />
           <Route path="/AboutUsManagement" element={<ProtectedRoute allowedRoles={['admin']}><AboutUsManagement /></ProtectedRoute>} />
           <Route path="/ITCellDashboard" element={<ProtectedRoute allowedRoles={['it_cell']}><ITCellDashboard /></ProtectedRoute>} />

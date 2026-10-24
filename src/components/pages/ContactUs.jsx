@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import axios from "axios";
+import { API_BASE_URL } from "../../apiConfig";
 import "./ContactUs.css";
 
 const ContactUs = () => {
@@ -11,14 +13,43 @@ const ContactUs = () => {
   });
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    if (name === "phone") {
+      const digits = value.replace(/\D/g, "").slice(0, 10);
+      setFormData({ ...formData, phone: digits });
+      return;
+    }
+    setFormData({ ...formData, [name]: value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Contact form submitted:", formData);
-    alert("Thank you! Your message has been received.");
-    setFormData({ name: "", email: "", phone: "", subject: "", message: "" });
+    if (!/^\d{10}$/.test(formData.phone)) {
+      alert("Phone number must be exactly 10 digits.");
+      return;
+    }
+    if (/[A-Z]/.test(formData.email)) {
+      alert("Email must be in lowercase letters only.");
+      return;
+    }
+    if (!/^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/.test(formData.email)) {
+      alert("Please enter a valid email address.");
+      return;
+    }
+    try {
+      await axios.post(`${API_BASE_URL}/contact-enquiries/`, {
+        full_name: formData.name,
+        email: formData.email,
+        subject: formData.subject,
+        phone: formData.phone,
+        message: formData.message,
+      });
+      alert("Thank you! Your message has been received.");
+      setFormData({ name: "", email: "", phone: "", subject: "", message: "" });
+    } catch (err) {
+      console.error("Contact form submission failed:", err);
+      alert("Something went wrong. Please try again later.");
+    }
   };
 
   return (
@@ -74,6 +105,8 @@ const ContactUs = () => {
                   placeholder="Your Phone"
                   value={formData.phone}
                   onChange={handleChange}
+                  maxLength={10}
+                  pattern="[0-9]{10}"
                 />
                 <input
                   type="text"

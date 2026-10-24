@@ -40,7 +40,13 @@ const AdminLeftNav = ({ sidebarOpen }) => {
           <i className="bi bi-speedometer2 me-2"></i> Add Demartment
         </Link>
        
-      
+        <Link 
+          to="/ContactQuery" 
+          className={`nav-link text-white rounded ${location.pathname === '/ContactQuery' ? 'bg-primary bg-opacity-25 shadow-sm active fw-bold' : 'opacity-75'}`}
+        >
+          <i className="bi bi-speedometer2 me-2"></i> Contact Query
+        </Link>
+       
       </nav>
     </aside>
   );
