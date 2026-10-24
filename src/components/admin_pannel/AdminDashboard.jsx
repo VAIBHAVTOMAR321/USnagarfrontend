@@ -225,14 +225,12 @@ const AdminDashboard = () => {
       }
 
       if (editingItem) {
-        // PUT: include the item ID
+        // PUT: include the item ID in the body
         payload.append("id", String(editingItem.id));
 
-        await api.put(
-          `${CAROUSEL_URL}${editingItem.id}/`,
-          payload,
-          { withCredentials: true }
-        );
+        await api.put(CAROUSEL_URL, payload, {
+          withCredentials: true,
+        });
 
         setSuccess("Carousel item updated successfully.");
       } else {
