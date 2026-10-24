@@ -309,7 +309,7 @@ const AddDemartment = () => {
                   >
                     <thead className="table-light">
                       <tr>
-                        <th>ID</th>
+                       
                         <th>Department Name</th>
                         <th className="text-center">Actions</th>
                       </tr>
@@ -328,7 +328,7 @@ const AddDemartment = () => {
                       ) : (
                         departments.map((item) => (
                           <tr key={item.id}>
-                            <td>{item.id}</td>
+                          
 
                             <td className="fw-semibold">
                               {item.dept_name}

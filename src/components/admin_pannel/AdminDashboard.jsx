@@ -400,10 +400,9 @@ const AdminDashboard = () => {
                     hover
                     className="align-middle mb-0"
                   >
-                    <thead className="table-light">
-                      <tr>
-                        <th>ID</th>
-                        <th>Title</th>
+                     <thead className="table-light table-style">
+                       <tr>
+                         <th>Title</th>
                         <th>Description</th>
                         <th>Image</th>
                         <th className="text-center">Actions</th>
@@ -422,10 +421,8 @@ const AdminDashboard = () => {
                         </tr>
                       ) : (
                         carouselItems.map((item) => (
-                          <tr key={item.id}>
-                            <td>{item.id}</td>
-
-                            <td className="fw-semibold">
+                           <tr key={item.id}>
+                             <td className="fw-semibold">
                               {item.title}
                             </td>
 

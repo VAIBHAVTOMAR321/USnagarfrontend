@@ -394,9 +394,8 @@ const GalleryManagement = () => {
                     className="align-middle mb-0"
                   >
                     <thead className="table-light">
-                      <tr>
-                        <th>ID</th>
-                        <th>Title</th>
+                       <tr>
+                         <th>Title</th>
                         <th>Image</th>
                         <th className="text-center">Actions</th>
                       </tr>
@@ -414,10 +413,8 @@ const GalleryManagement = () => {
                         </tr>
                       ) : (
                         galleryItems.map((item) => (
-                          <tr key={item.id}>
-                            <td>{item.id}</td>
-
-                            <td className="fw-semibold">
+                           <tr key={item.id}>
+                             <td className="fw-semibold">
                               {item.title}
                             </td>
 
