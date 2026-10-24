@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext';
@@ -29,7 +29,7 @@ const ROLE_DASHBOARD_MAP = {
 const Login = () => {
   const [role, setRole] = useState('admin');
   const [username, setUsername] = useState('admin');
-  const [password, setPassword] = useState('');
+  const passwordRef = useRef(null);
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
@@ -100,7 +100,7 @@ const Login = () => {
     try {
       const payload = {
         username: username,
-        password: password,
+        password: passwordRef.current?.value || '',
         role: role,
         captcha_key: captchaKey,
         captcha_answer: captchaAnswer,
@@ -198,9 +198,9 @@ const Login = () => {
                   <input 
                     type={showPassword ? "text" : "password"} 
                     className="form-control form-control-sm bg-light border-0 pe-5" 
-                    placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Enter Password"
+                   
+                    ref={passwordRef}
                   />
                   <button 
                     type="button"
