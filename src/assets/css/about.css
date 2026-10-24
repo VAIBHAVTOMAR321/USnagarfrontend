@@ -101,7 +101,10 @@
 
 /* Theme Colors */
 .text-navy { color: #001f3f !important; }
-.text-cyan { color: #00e5ff !important; }
+.text-cyan {
+     color: #00e5ff !important;
+     font-size: 25px;
+     }
 
 /* Department Cards Enhancement */
 .dept-card {
