@@ -19,32 +19,32 @@ const AdminLeftNav = ({ sidebarOpen }) => {
           to="/AdminDashboard" 
           className={`nav-link text-white rounded ${location.pathname === '/AdminDashboard' ? 'bg-primary bg-opacity-25 shadow-sm active fw-bold' : 'opacity-75'}`}
         >
-          <i className="bi bi-speedometer2 me-2"></i> Admin Dashboard
+<i className="bi bi-speedometer2 me-2"></i> Admin Dashboard
         </Link>
          <Link 
           to="/GalleryManagement" 
           className={`nav-link text-white rounded ${location.pathname === '/GalleryManagement' ? 'bg-primary bg-opacity-25 shadow-sm active fw-bold' : 'opacity-75'}`}
         >
-          <i className="bi bi-speedometer2 me-2"></i> Gallery
+          <i className="bi bi-images me-2"></i> Gallery
         </Link>
          <Link 
           to="/AboutUsManagement" 
           className={`nav-link text-white rounded ${location.pathname === '/AboutUsManagement' ? 'bg-primary bg-opacity-25 shadow-sm active fw-bold' : 'opacity-75'}`}
         >
-          <i className="bi bi-speedometer2 me-2"></i> About Us
+          <i className="bi bi-info-circle me-2"></i> About Us
         </Link>
          <Link 
           to="/AddDemartment" 
           className={`nav-link text-white rounded ${location.pathname === '/AddDemartment' ? 'bg-primary bg-opacity-25 shadow-sm active fw-bold' : 'opacity-75'}`}
         >
-          <i className="bi bi-speedometer2 me-2"></i> Add Demartment
+          <i className="bi bi-building me-2"></i> Add Demartment
         </Link>
-       
+        
         <Link 
           to="/ContactQuery" 
           className={`nav-link text-white rounded ${location.pathname === '/ContactQuery' ? 'bg-primary bg-opacity-25 shadow-sm active fw-bold' : 'opacity-75'}`}
         >
-          <i className="bi bi-speedometer2 me-2"></i> Contact Query
+          <i className="bi bi-envelope me-2"></i> Contact Query
         </Link>
        
       </nav>
