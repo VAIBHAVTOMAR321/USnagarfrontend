@@ -296,8 +296,8 @@ export function AuthProvider({ children }) {
       // --------------------------------------------------
       // Redirect to login
       // --------------------------------------------------
-      window.history.replaceState(null, "", "/wecdschemes/Login");
-      window.location.replace("/wecdschemes/Login");
+      window.history.replaceState(null, "", "/pauripargati/Login");
+      window.location.replace("/pauripargati/Login");
     }
   }, []);
 
@@ -447,7 +447,7 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     const handlePopState = () => {
       if (!isAuthenticatedRef.current) {
-        window.location.replace("/wecdschemes/Login");
+        window.location.replace("/pauripargati/Login");
       } else {
         const path = window.location.pathname;
         const isLoginPage = path.includes("/Login") || path.includes("/login");
