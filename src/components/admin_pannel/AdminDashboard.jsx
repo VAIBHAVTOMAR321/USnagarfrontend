@@ -208,6 +208,12 @@ const AdminDashboard = () => {
       return;
     }
 
+    if (!editingItem && !imageFile) {
+      setError("Please select a carousel image.");
+      return;
+    }
+
+
     setSaving(true);
 
     try {
@@ -219,10 +225,8 @@ const AdminDashboard = () => {
       if (imageFile) {
         // Upload the actual selected file
         payload.append("image", imageFile);
-      } else if (!editingItem || removeExistingImage) {
-        // No image for a new item, or explicitly removing one
-        payload.append("image", "");
       }
+
 
       if (editingItem) {
         // PUT: include the item ID in the body

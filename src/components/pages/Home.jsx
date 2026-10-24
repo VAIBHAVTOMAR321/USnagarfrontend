@@ -243,7 +243,7 @@ function Home() {
             </Col>
             <Col lg={6} className="animate__animated animate__fadeInRight">
               <div className="hero-image-wrapper shadow-lg">
-                <img src={CM} alt="images" />
+                <img src={heroItem?.image ? getImageUrl(heroItem.image) : CM} alt="images" />
               </div>
             </Col>
           </Row>
