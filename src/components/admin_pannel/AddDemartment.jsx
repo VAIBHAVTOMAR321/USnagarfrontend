@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -16,10 +15,10 @@ import { useAuth } from "../all_login/AuthContext";
 import AdminHeader from "./AdminHeader";
 import AdminLeftNav from "./AdminLeftNav";
 
-const GALLERY_URL = "/gallery/";
+const DEPARTMENT_URL = "/departments/";
 
 const INITIAL_FORM = {
-  title: "",
+  dept_name: "",
 };
 
 const AddDemartment = () => {
@@ -27,7 +26,7 @@ const AddDemartment = () => {
   const navigate = useNavigate();
 
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [galleryItems, setgalleryItems] = useState([]);
+  const [departments, setDepartments] = useState([]);
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -37,9 +36,6 @@ const AddDemartment = () => {
   const [editingItem, setEditingItem] = useState(null);
 
   const [formData, setFormData] = useState(INITIAL_FORM);
-  const [imageFile, setImageFile] = useState(null);
-  const [imagePreview, setImagePreview] = useState(null);
-  const [removeExistingImage, setRemoveExistingImage] = useState(false);
 
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -52,23 +48,23 @@ const AddDemartment = () => {
     }
   };
 
-  // GET: Fetch Gallery Items
-  const fetchGallery = useCallback(async () => {
+  // GET: Fetch Departments
+  const fetchDepartments = useCallback(async () => {
     setLoading(true);
     setError("");
 
     try {
-      const response = await api.get(GALLERY_URL);
+      const response = await api.get(DEPARTMENT_URL);
       const items = response.data?.data;
 
-      setgalleryItems(Array.isArray(items) ? items : []);
+      setDepartments(Array.isArray(items) ? items : []);
     } catch (err) {
-      console.error("GET Gallery error:", err);
+      console.error("GET Departments error:", err);
 
       setError(
         err.response?.data?.detail ||
           err.response?.data?.message ||
-          "Failed to load Gallery Items."
+          "Failed to load Departments."
       );
     } finally {
       setLoading(false);
@@ -76,41 +72,8 @@ const AddDemartment = () => {
   }, [api]);
 
   useEffect(() => {
-    fetchGallery();
-  }, [fetchGallery]);
-
-  const IMAGE_PREFIX = "/pauripargati/pauripargati_backend";
-
-  // Convert image paths to usable URLs
-  const getImageUrl = (image) => {
-    if (!image || typeof image !== "string") {
-      return null;
-    }
-
-    if (
-      image.startsWith("http://") ||
-      image.startsWith("https://") ||
-      image.startsWith("data:") ||
-      image.startsWith("blob:")
-    ) {
-      // Insert the missing path prefix if the URL points to /media/...
-      if (
-        image.startsWith("https://mahadevaaya.com/media/") ||
-        image.startsWith("http://mahadevaaya.com/media/")
-      ) {
-        return image.replace(
-          "mahadevaaya.com/media/",
-          "mahadevaaya.com/pauripargati/pauripargati_backend/media/"
-        );
-      }
-
-      return image; 
-    }
-
-    return `https://mahadevaaya.com${IMAGE_PREFIX}${
-      image.startsWith("/") ? "" : "/"
-    }${image}`;
-  };
+    fetchDepartments();
+  }, [fetchDepartments]);
 
   // Form input changes
   const handleInputChange = (e) => {
@@ -125,47 +88,12 @@ const AddDemartment = () => {
     setSuccess("");
   };
 
-  // Revoke temporary image preview URLs
-  const clearImagePreview = () => {
-    if (imagePreview?.startsWith("blob:")) {
-      URL.revokeObjectURL(imagePreview);
-    }
-  };
-
-  // File input: user selects an image
-  const handleImageChange = (e) => {
-    const file = e.target.files?.[0] || null;
-
-    if (!file) {
-      return;
-    }
-
-    if (!file.type.startsWith("image/")) {
-      setError("Please select a valid image file.");
-      e.target.value = "";
-      return;
-    }
-
-    clearImagePreview();
-
-    setImageFile(file);
-    setImagePreview(URL.createObjectURL(file));
-    setRemoveExistingImage(false);
-
-    setError("");
-    setSuccess("");
-  };
-
   // Reset form
   const resetForm = () => {
-    clearImagePreview();
-
     setEditingItem(null);
     setFormData(INITIAL_FORM);
-    setImageFile(null);
-    setImagePreview(null);
-    setRemoveExistingImage(false);
     setError("");
+    setSuccess("");
   };
 
   // Open Add modal
@@ -177,17 +105,11 @@ const AddDemartment = () => {
 
   // Open Edit modal
   const handleEdit = (item) => {
-    clearImagePreview();
-
     setEditingItem(item);
 
     setFormData({
-      title: item.title || "",
+      dept_name: item.dept_name || "",
     });
-
-    setImageFile(null);
-    setImagePreview(getImageUrl(item.image));
-    setRemoveExistingImage(false);
 
     setError("");
     setSuccess("");
@@ -201,50 +123,42 @@ const AddDemartment = () => {
     setError("");
     setSuccess("");
 
-    if (!formData.title.trim()) {
-      setError("Please enter a gallery title.");
+    if (!formData.dept_name.trim()) {
+      setError("Please enter a department name.");
       return;
     }
 
     setSaving(true);
 
     try {
-      const payload = new FormData();
-
-      payload.append("title", formData.title.trim());
-
-      if (imageFile) {
-        // Upload the actual selected file
-        payload.append("image", imageFile);
-      } else if (!editingItem || removeExistingImage) {
-        // No image for a new item, or explicitly removing one
-        payload.append("image", "");
-      }
+      const payload = {
+        dept_name: formData.dept_name.trim(),
+      };
 
       if (editingItem) {
         // PUT: include the item ID in the body
-        payload.append("id", String(editingItem.id));
+        payload.id = editingItem.id;
 
-        await api.put(GALLERY_URL, payload, {
+        await api.put(DEPARTMENT_URL, payload, {
           withCredentials: true,
         });
 
-        setSuccess("gallery item updated successfully.");
+        setSuccess("Department updated successfully.");
       } else {
-        // POST: create a new item
-        await api.post(GALLERY_URL, payload, {
+        // POST: create a new department
+        await api.post(DEPARTMENT_URL, payload, {
           withCredentials: true,
         });
 
-        setSuccess("gallery item created successfully.");
+        setSuccess("Department created successfully.");
       }
 
       setShowModal(false);
       resetForm();
 
-      await fetchGallery();
+      await fetchDepartments();
     } catch (err) {
-      console.error("Save Gallery error:", err);
+      console.error("Save Department error:", err);
 
       const responseData = err.response?.data;
 
@@ -256,17 +170,17 @@ const AddDemartment = () => {
               (responseData
                 ? JSON.stringify(responseData)
                 : err.message) ||
-              "Failed to save gallery item."
+              "Failed to save department."
       );
     } finally {
       setSaving(false);
     }
   };
 
-  // DELETE: Remove item
+  // DELETE: Remove department
   const handleDelete = async (id) => {
     const confirmed = window.confirm(
-      "Are you sure you want to delete this gallery item?"
+      "Are you sure you want to delete this department?"
     );
 
     if (!confirmed) {
@@ -278,21 +192,21 @@ const AddDemartment = () => {
     setDeletingId(id);
 
     try {
-      await api.delete(`${GALLERY_URL}`, {
+      await api.delete(`${DEPARTMENT_URL}`, {
         data: { id },
         withCredentials: true,
       });
 
-      setSuccess("gallery item deleted successfully.");
+      setSuccess("Department deleted successfully.");
 
-      await fetchGallery();
+      await fetchDepartments();
     } catch (err) {
-      console.error("Delete Gallery error:", err);
+      console.error("Delete Department error:", err);
 
       setError(
         err.response?.data?.detail ||
           err.response?.data?.message ||
-          "Failed to delete gallery item."
+          "Failed to delete department."
       );
     } finally {
       setDeletingId(null);
@@ -329,11 +243,11 @@ const AddDemartment = () => {
           <div className="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
             <div>
               <h2 className="mb-1 fw-bold">
-                Gallery Management
+                Department Management
               </h2>
 
               <p className="text-muted mb-0">
-                Manage Pauri Pargati gallery items.
+                Manage departments.
               </p>
             </div>
 
@@ -343,7 +257,7 @@ const AddDemartment = () => {
               disabled={loading}
             >
               <i className="bi bi-plus-circle me-2"></i>
-              Add Gallery Item
+              Add Department
             </Button>
           </div>
 
@@ -373,11 +287,11 @@ const AddDemartment = () => {
             <Card.Body>
               <div className="d-flex justify-content-between align-items-center mb-3">
                 <h5 className="fw-bold mb-0">
-                  Gallery Items
+                  Departments
                 </h5>
 
                 <Badge bg="primary">
-                  {galleryItems.length} Items
+                  {departments.length} Departments
                 </Badge>
               </div>
 
@@ -385,7 +299,7 @@ const AddDemartment = () => {
                 <div className="text-center py-5">
                   <Spinner animation="border" variant="primary" />
                   <p className="text-muted mt-2">
-                    Loading Gallery Items...
+                    Loading Departments...
                   </p>
                 </div>
               ) : (
@@ -399,48 +313,28 @@ const AddDemartment = () => {
                     <thead className="table-light">
                       <tr>
                         <th>ID</th>
-                        <th>Title</th>
-                        <th>Image</th>
+                        <th>Department Name</th>
                         <th className="text-center">Actions</th>
                       </tr>
                     </thead>
 
                     <tbody>
-                      {galleryItems.length === 0 ? (
+                      {departments.length === 0 ? (
                         <tr>
                           <td
-                            colSpan={4}
+                            colSpan={3}
                             className="text-center text-muted py-4"
                           >
-                            No Gallery Items found.
+                            No Departments found.
                           </td>
                         </tr>
                       ) : (
-                        galleryItems.map((item) => (
+                        departments.map((item) => (
                           <tr key={item.id}>
                             <td>{item.id}</td>
 
                             <td className="fw-semibold">
-                              {item.title}
-                            </td>
-
-                            <td>
-                              {getImageUrl(item.image) ? (
-                                <img
-                                  src={getImageUrl(item.image)}
-                                  alt={item.title || "Gallery"}
-                                  className="img-thumbnail"
-                                  style={{
-                                    width: "100px",
-                                    height: "65px",
-                                    objectFit: "cover",
-                                  }}
-                                />
-                              ) : (
-                                <span className="text-muted">
-                                  No image
-                                </span>
-                              )}
+                              {item.dept_name}
                             </td>
 
                             <td className="text-center">
@@ -497,8 +391,8 @@ const AddDemartment = () => {
             <Modal.Header closeButton={!saving}>
               <Modal.Title className="fw-bold">
                 {editingItem
-                  ? "Edit Gallery Item"
-                  : "Add Gallery Item"}
+                  ? "Edit Department"
+                  : "Add Department"}
               </Modal.Title>
             </Modal.Header>
 
@@ -511,63 +405,16 @@ const AddDemartment = () => {
 
               <Form onSubmit={handleSave}>
                 <Form.Group className="mb-3">
-                  <Form.Label>Title</Form.Label>
+                  <Form.Label>Department Name</Form.Label>
 
                   <Form.Control
                     type="text"
-                    name="title"
-                    placeholder="Enter gallery title"
-                    value={formData.title}
+                    name="dept_name"
+                    placeholder="Enter department name"
+                    value={formData.dept_name}
                     onChange={handleInputChange}
                     required
                   />
-                </Form.Group>
-
-                <Form.Group className="mb-3">
-                  <Form.Label>
-                    Gallery Image (Optional)
-                  </Form.Label>
-
-                  <Form.Control
-                    type="file"
-                    name="image"
-                    accept="image/*"
-                    onChange={handleImageChange}
-                  />
-
-                  <Form.Text className="text-muted">
-                    Choose an image from your computer.
-                  </Form.Text>
-
-                  {imagePreview && (
-                    <div className="mt-3">
-                      <img
-                        src={imagePreview}
-                        alt="Gallery preview"
-                        className="img-thumbnail"
-                        style={{
-                          width: "200px",
-                          height: "130px",
-                          objectFit: "cover",
-                        }}
-                      />
-
-                      <Button
-                        type="button"
-                        variant="outline-danger"
-                        size="sm"
-                        className="d-block mt-2"
-                        onClick={() => {
-                          clearImagePreview();
-                          setImageFile(null);
-                          setImagePreview(null);
-                          setRemoveExistingImage(true);
-                        }}
-                      >
-                        Remove Image
-                      </Button>
-                    </div>
-                  )}
                 </Form.Group>
 
                 <div className="d-flex gap-2 mt-4">
@@ -586,9 +433,9 @@ const AddDemartment = () => {
                         Saving...
                       </>
                     ) : editingItem ? (
-                      "Update Gallery"
+                      "Update Department"
                     ) : (
-                      "Add Gallery"
+                      "Add Department"
                     )}
                   </Button>
 

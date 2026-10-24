@@ -356,14 +356,14 @@ const AboutUsManagement = () => {
               </p>
             </div>
 
-            <Button
+            {/* <Button
               variant="primary"
               onClick={handleAdd}
               disabled={loading}
             >
               <i className="bi bi-plus-circle me-2"></i>
               Add About Us Item
-            </Button>
+            </Button> */}
           </div>
 
           {/* Alerts */}

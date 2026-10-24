@@ -25,7 +25,7 @@ const AdminLeftNav = ({ sidebarOpen }) => {
           to="/GalleryManagement" 
           className={`nav-link text-white rounded ${location.pathname === '/GalleryManagement' ? 'bg-primary bg-opacity-25 shadow-sm active fw-bold' : 'opacity-75'}`}
         >
-          <i className="bi bi-speedometer2 me-2"></i> Admin Dashboard
+          <i className="bi bi-speedometer2 me-2"></i> Gallery
         </Link>
          <Link 
           to="/AboutUsManagement" 
@@ -37,7 +37,7 @@ const AdminLeftNav = ({ sidebarOpen }) => {
           to="/AddDemartment" 
           className={`nav-link text-white rounded ${location.pathname === '/AddDemartment' ? 'bg-primary bg-opacity-25 shadow-sm active fw-bold' : 'opacity-75'}`}
         >
-          <i className="bi bi-speedometer2 me-2"></i> About Us
+          <i className="bi bi-speedometer2 me-2"></i> Add Demartment
         </Link>
        
       
