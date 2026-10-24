@@ -115,6 +115,14 @@ const Login = () => {
           username: response.data.username,
           user: null,
         });
+        sessionStorage.setItem(
+          "auth_user",
+          JSON.stringify({
+            username: response.data.username,
+            role: response.data.role,
+            unique_id: response.data.unique_id,
+          }),
+        );
         alert("Login Success!");
 
         const targetPath = ROLE_DASHBOARD_MAP[response.data.role] || '/';

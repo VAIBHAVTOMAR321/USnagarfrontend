@@ -384,14 +384,6 @@ export function AuthProvider({ children }) {
   }, [logout]);
 
   // ========================================================
-  // INITIALIZE AUTH STATE
-  // ========================================================
-  useEffect(() => {
-    setIsReady(true);
-    isAuthenticatedRef.current = !!user;
-  }, [user]);
-
-  // ========================================================
   // IDLE TIMEOUT (5 Minutes)
   // ========================================================
   useEffect(() => {
@@ -570,6 +562,60 @@ export function AuthProvider({ children }) {
 
     return instance;
   }, [logout, refreshAccessToken]);
+
+  // ========================================================
+  // RE-HYDRATE AUTH STATE ON PAGE REFRESH
+  // Restores user/role from sessionStorage when the HttpOnly
+  // session cookies are still valid, so a refresh does not kick
+  // the user back to /Login. isReady stays false until done so
+  // ProtectedRoute shows a spinner instead of flashing a redirect.
+  // ========================================================
+  useEffect(() => {
+    let mounted = true;
+
+    const initializeAuth = async () => {
+      // Already logged in during this session; nothing to restore.
+      if (user) {
+        isAuthenticatedRef.current = true;
+        lastActivityRef.current = Date.now();
+      } else {
+        // Validate the HttpOnly session before restoring state.
+        try {
+          const response = await api.get("/session-status/");
+
+          if (response?.data?.valid === true) {
+            const stored = sessionStorage.getItem("auth_user");
+            if (stored) {
+              try {
+                const data = JSON.parse(stored);
+                setUser(data.username || null);
+                setRole(data.role);
+                setUniqueId(data.unique_id);
+                isAuthenticatedRef.current = true;
+                lastActivityRef.current = Date.now();
+              } catch (_parseError) {
+                sessionStorage.removeItem("auth_user");
+              }
+            }
+          } else {
+            sessionStorage.removeItem("auth_user");
+          }
+        } catch (_error) {
+          sessionStorage.removeItem("auth_user");
+        }
+      }
+
+      if (mounted) {
+        setIsReady(true);
+      }
+    };
+
+    initializeAuth();
+
+    return () => {
+      mounted = false;
+    };
+  }, [api, user]);
 
   // ========================================================
   // SESSION STATUS POLLING

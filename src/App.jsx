@@ -20,12 +20,12 @@ import PhotoGallery from './components/pages/PhotoGallery'; // Import the new co
 import ProtectedRoute from "./components/all_login/ProtectedRoute";
 import AdminDashboard from "./components/admin_pannel/AdminDashboard";
 import ITCellDashboard from "./components/it_cell_pannel/ITCellDashboard";
+import GallaryManagement from "./components/admin_pannel/GallaryManagement";
 import DepartmentDashboard from "./components/department_pannel/DepartmentDashboard";
 import AdminLeftNav from "./components/admin_pannel/AdminLeftNav"; // Import AdminLeftNav
 import DepartmentDetailsManagement from "./components/it_cell_pannel/DepartmentDetailsManagement";
 import AddWork from "./components/department_pannel/AddWork";
 import AddWorkDetails from "./components/department_pannel/AddWorkDetails";
-import AdminDepartmentAnalytics from "./components/admin_pannel/AdminDepartmentAnalytics";
 import Footer from "./components/footer/Footer";
 import ContactUs from "./components/pages/ContactUs";
 function AppContent() {
@@ -38,7 +38,7 @@ function AppContent() {
     "/ITCell/DepartmentDetails",
     "/AddWork",
     "/AddWorkDetails",
-    "/Admin/Analytics",
+    "/GallaryManagement",
   ];
   const shouldHideNavbar = hideNavbarRoutes.includes(location.pathname);
   const hideFooterRoutes = [
@@ -48,7 +48,7 @@ function AppContent() {
     "/ITCell/DepartmentDetails",
     "/AddWork",
     "/AddWorkDetails",
-    "/Admin/Analytics",
+    "/GallaryManagement",
   ];
   const shouldHideFooter = hideNavbarRoutes.includes(location.pathname);
 
@@ -63,7 +63,7 @@ function AppContent() {
           <Route path="/AddWork" element={<ProtectedRoute allowedRoles={['department', 'it_cell', 'admin']}><AddWork /></ProtectedRoute>} />
           <Route path="/AddWorkDetails" element={<ProtectedRoute allowedRoles={['department']}><AddWorkDetails /></ProtectedRoute>} />
           <Route path="/AdminDashboard" element={<ProtectedRoute allowedRoles={['admin']}><AdminDashboard /></ProtectedRoute>} />
-          <Route path="/Admin/Analytics" element={<ProtectedRoute allowedRoles={['admin']}><AdminDepartmentAnalytics /></ProtectedRoute>} />
+          <Route path="/GallaryManagement" element={<ProtectedRoute allowedRoles={['admin']}><GallaryManagement /></ProtectedRoute>} />
           <Route path="/ITCellDashboard" element={<ProtectedRoute allowedRoles={['it_cell']}><ITCellDashboard /></ProtectedRoute>} />
           <Route path="/DepartmentDashboard" element={<ProtectedRoute allowedRoles={['department']}><DepartmentDashboard /></ProtectedRoute>} />
           <Route path="/ITCell/DepartmentDetails" element={<ProtectedRoute allowedRoles={['it_cell']}><DepartmentDetailsManagement /></ProtectedRoute>} />  
