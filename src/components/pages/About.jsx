@@ -1,15 +1,25 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
+import { API_BASE_URL } from '../../apiConfig';
 import '../../assets/css/about.css';
 
 export const AboutSection = ({ isPreview = false }) => {
-  const bulletPoints = [
-    "Direct access to essential government services and schemes.",
-    "Transparent administrative processes for public accountability.",
-    "Citizen-centric feedback loops for improved governance.",
-    "Real-time updates on district development initiatives."
-  ];
+  const [items, setItems] = useState([]);
+
+  useEffect(() => {
+    const fetchItems = async () => {
+      try {
+        const res = await axios.get(`${API_BASE_URL}/about-us-items/`);
+        const data = Array.isArray(res.data) ? res.data : res.data?.data || res.data?.results || [];
+        setItems(data);
+      } catch (e) {
+        setItems([]);
+      }
+    };
+    fetchItems();
+  }, []);
 
   return (
     <Row className="align-items-center gy-4">
@@ -24,22 +34,24 @@ export const AboutSection = ({ isPreview = false }) => {
       </Col>
       <Col lg={7} className="ps-lg-5 animate__animated animate__fadeInRight">
         <div className="about-content-wrapper">
-          <h2 className="about-main-heading fw-bold text-navy">
-            <span className="text-cyan">ABOUT US —</span> Empowering Transparency and Access
-          </h2>
-          <div className="about-para-group">
-            <p>
-              We are committed to fostering a transparent and accessible relationship between the district administration and our citizens. Our portal serves as a digital bridge, ensuring every resident can engage with local governance effectively.
-            </p>
-            <ul className="list-unstyled mt-4">
-              {bulletPoints.map((point, index) => (
-                <li key={index} className="mb-3 d-flex align-items-center">
-                  <span className="me-3 text-cyan" style={{ fontSize: '1.2rem' }}>✔</span>
-                  <span className="text-muted">{point}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
+          {items.map((item) => (
+            <div key={item.id} className="mb-4">
+              <h2 className="about-main-heading fw-bold text-navy">
+                <span className="text-cyan d-block">{item.title}</span>
+                <span className="d-block">{item.description}</span>
+              </h2>
+              {Array.isArray(item.module) && item.module.length > 0 && (
+                <ul className="list-unstyled mt-3">
+                  {item.module.map((m, index) => (
+                    <li key={index} className="mb-2 d-flex align-items-center">
+                      <span className="me-3 text-cyan" style={{ fontSize: '1.2rem' }}>✔</span>
+                      <span className="text-muted">{m}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          ))}
           {isPreview && (
             <Link to="/about" className="btn btn-about-more mt-2">Read More →</Link>
           )}
@@ -50,18 +62,20 @@ export const AboutSection = ({ isPreview = false }) => {
 };
 
 const About = () => {
-  const departments = [
-    "कृषि विभाग",
-    "उद्यान विभाग",
-    "पशु पालन विभाग",
-    "शिक्षा विभाग",
-    "स्वास्थ्य विभाग",
-    "राजस्व विभाग",
-    "समाज कल्याण विभाग",
-    "सिंचाई विभाग",
-    "लोक निर्माण विभाग",
-    "विकास विभाग"
-  ];
+  const [departments, setDepartments] = useState([]);
+
+  useEffect(() => {
+    const fetchDepartments = async () => {
+      try {
+        const res = await axios.get(`${API_BASE_URL}/departments/`);
+        const data = Array.isArray(res.data) ? res.data : res.data?.data || res.data?.results || [];
+        setDepartments(data);
+      } catch (e) {
+        setDepartments([]);
+      }
+    };
+    fetchDepartments();
+  }, []);
 
   return (
     <div className="about-page-container">
@@ -92,9 +106,9 @@ const About = () => {
           </div>
           <Row className="g-4">
             {departments.map((dept, index) => (
-              <Col key={index} xs={12} sm={6} md={4} lg={3}>
+              <Col key={dept.id || index} xs={12} sm={6} md={4} lg={3}>
                 <div className="dept-card p-4 text-center shadow-sm h-100 d-flex align-items-center justify-content-center">
-                  <h5 className="hindi-typography mb-0 text-navy">{dept}</h5>
+                  <h5 className="hindi-typography mb-0 text-navy">{dept.dept_name}</h5>
                 </div>
               </Col>
             ))}
