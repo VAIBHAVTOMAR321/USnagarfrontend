@@ -3,16 +3,62 @@ import { Link } from 'react-router-dom';
 import { Container, Row, Col, Card } from 'react-bootstrap';
 import axios from 'axios';
 import { AboutSection } from './About';
-import { GALLERY_IMAGES } from './PhotoGallery';
 import CM from  "../../assets/images/final_banner_cm.jpeg"
 import { API_BASE_URL } from '../../apiConfig';
 import '../../assets/css/home.css'
+
+const PLACEHOLDER = 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=800&q=80';
+
+const IMAGE_PREFIX = '/pauripargati/pauripargati_backend';
+
+const getImageUrl = (image) => {
+  if (!image || typeof image !== 'string') {
+    return PLACEHOLDER;
+  }
+
+  if (
+    image.startsWith('http://') ||
+    image.startsWith('https://') ||
+    image.startsWith('data:') ||
+    image.startsWith('blob:')
+  ) {
+    if (
+      image.startsWith('https://mahadevaaya.com/media/') ||
+      image.startsWith('http://mahadevaaya.com/media/')
+    ) {
+      return image.replace(
+        'mahadevaaya.com/media/',
+        'mahadevaaya.com/pauripargati/pauripargati_backend/media/'
+      );
+    }
+
+    return image;
+  }
+
+  return `https://mahadevaaya.com${IMAGE_PREFIX}${
+    image.startsWith('/') ? '' : '/'
+  }${image}`;
+};
 
 // Photo Gallery Carousel Component
 const HomePhotoGalleryCarousel = () => {
   const [scrollPosition, setScrollPosition] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+  const [images, setImages] = useState([]);
   const carouselRef = useRef(null);
+
+  useEffect(() => {
+    const fetchGallery = async () => {
+      try {
+        const res = await axios.get(`${API_BASE_URL}/gallery/`);
+        const data = Array.isArray(res.data) ? res.data : res.data?.data || res.data?.results || [];
+        setImages(data.map((g) => ({ id: g.id, title: g.title, url: getImageUrl(g.image) })));
+      } catch (e) {
+        setImages([]);
+      }
+    };
+    fetchGallery();
+  }, []);
 
   useEffect(() => {
     const carousel = carouselRef.current;
@@ -67,7 +113,7 @@ const HomePhotoGalleryCarousel = () => {
 
       {/* Carousel Content */}
       <div className="home-gallery-carousel-content" ref={carouselRef}>
-        {GALLERY_IMAGES.map((image) => (
+        {images.map((image) => (
           <div
             key={image.id}
             className="home-gallery-item"

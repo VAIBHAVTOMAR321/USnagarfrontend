@@ -1,19 +1,42 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-import '../../assets/css/about.css'; // Reusing base styles, consider creating gallery.css
+import axios from 'axios';
+import { API_BASE_URL } from '../../apiConfig';
+import '../../assets/css/about.css';
 
-// Export gallery data for reuse
-export const GALLERY_IMAGES = [
-  { id: 1, title: "District Headquarters", url: "https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=800&q=80" },
-  { id: 2, title: "Agricultural Fields", url: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=800&q=80" },
-  { id: 3, title: "Cultural Festival", url: "https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?auto=format&fit=crop&w=800&q=80" },
-  { id: 4, title: "Local Infrastructure", url: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80" },
-  { id: 5, title: "Nature Reserve", url: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=800&q=80" },
-  { id: 6, title: "Community Center", url: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=800&q=80" },
-  { id: 7, title: "Education Hub", url: "https://images.unsplash.com/photo-1523050335191-91fb5097aa81?auto=format&fit=crop&w=800&q=80" },
-  { id: 8, title: "Sunset Point", url: "https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?auto=format&fit=crop&w=800&q=80" }
-];
+const PLACEHOLDER = 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=800&q=80';
+
+const IMAGE_PREFIX = '/pauripargati/pauripargati_backend';
+
+const getImageUrl = (image) => {
+  if (!image || typeof image !== 'string') {
+    return PLACEHOLDER;
+  }
+
+  if (
+    image.startsWith('http://') ||
+    image.startsWith('https://') ||
+    image.startsWith('data:') ||
+    image.startsWith('blob:')
+  ) {
+    if (
+      image.startsWith('https://mahadevaaya.com/media/') ||
+      image.startsWith('http://mahadevaaya.com/media/')
+    ) {
+      return image.replace(
+        'mahadevaaya.com/media/',
+        'mahadevaaya.com/pauripargati/pauripargati_backend/media/'
+      );
+    }
+
+    return image;
+  }
+
+  return `https://mahadevaaya.com${IMAGE_PREFIX}${
+    image.startsWith('/') ? '' : '/'
+  }${image}`;
+};
 
 export const GalleryIntro = () => {
   return (
@@ -47,7 +70,20 @@ export const GalleryIntro = () => {
 };
 
 const PhotoGallery = () => {
-  const galleryImages = GALLERY_IMAGES;
+  const [galleryImages, setGalleryImages] = useState([]);
+
+  useEffect(() => {
+    const fetchGallery = async () => {
+      try {
+        const res = await axios.get(`${API_BASE_URL}/gallery/`);
+        const data = Array.isArray(res.data) ? res.data : res.data?.data || res.data?.results || [];
+        setGalleryImages(data.map((g) => ({ id: g.id, title: g.title, url: getImageUrl(g.image) })));
+      } catch (e) {
+        setGalleryImages([]);
+      }
+    };
+    fetchGallery();
+  }, []);
 
   return (
     <div className="about-page-container">
