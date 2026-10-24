@@ -21,6 +21,24 @@ const AdminLeftNav = ({ sidebarOpen }) => {
         >
           <i className="bi bi-speedometer2 me-2"></i> Admin Dashboard
         </Link>
+         <Link 
+          to="/GalleryManagement" 
+          className={`nav-link text-white rounded ${location.pathname === '/GalleryManagement' ? 'bg-primary bg-opacity-25 shadow-sm active fw-bold' : 'opacity-75'}`}
+        >
+          <i className="bi bi-speedometer2 me-2"></i> Admin Dashboard
+        </Link>
+         <Link 
+          to="/AboutUsManagement" 
+          className={`nav-link text-white rounded ${location.pathname === '/AboutUsManagement' ? 'bg-primary bg-opacity-25 shadow-sm active fw-bold' : 'opacity-75'}`}
+        >
+          <i className="bi bi-speedometer2 me-2"></i> About Us
+        </Link>
+         <Link 
+          to="/AddDemartment" 
+          className={`nav-link text-white rounded ${location.pathname === '/AddDemartment' ? 'bg-primary bg-opacity-25 shadow-sm active fw-bold' : 'opacity-75'}`}
+        >
+          <i className="bi bi-speedometer2 me-2"></i> About Us
+        </Link>
        
       
       </nav>
