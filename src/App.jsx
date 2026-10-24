@@ -19,14 +19,9 @@ import About from './components/pages/About';
 import PhotoGallery from './components/pages/PhotoGallery'; // Import the new component
 import ProtectedRoute from "./components/all_login/ProtectedRoute";
 import AdminDashboard from "./components/admin_pannel/AdminDashboard";
-import ITCellDashboard from "./components/it_cell_pannel/ITCellDashboard";
 import GalleryManagement from "./components/admin_pannel/GalleryManagement";
-import DepartmentDashboard from "./components/department_pannel/DepartmentDashboard";
 import AdminLeftNav from "./components/admin_pannel/AdminLeftNav"; // Import AdminLeftNav
 import AboutUsManagement from "./components/admin_pannel/AboutUsManagement";
-import DepartmentDetailsManagement from "./components/it_cell_pannel/DepartmentDetailsManagement";
-import AddWork from "./components/department_pannel/AddWork";
-import AddWorkDetails from "./components/department_pannel/AddWorkDetails";
 import Footer from "./components/footer/Footer";
 import ContactUs from "./components/pages/ContactUs";
 import AddDemartment from "./components/admin_pannel/AddDemartment";
@@ -36,11 +31,6 @@ function AppContent() {
 
   const hideNavbarRoutes = [
     "/AdminDashboard",
-    "/ITCellDashboard",
-    "/DepartmentDashboard",
-    "/ITCell/DepartmentDetails",
-    "/AddWork",
-    "/AddWorkDetails",
     "/GalleryManagement",
     "/AboutUsManagement",
     "/AddDemartment",
@@ -49,17 +39,12 @@ function AppContent() {
   const shouldHideNavbar = hideNavbarRoutes.includes(location.pathname);
   const hideFooterRoutes = [
     "/AdminDashboard",
-    "/ITCellDashboard",
-    "/DepartmentDashboard",
-    "/ITCell/DepartmentDetails",
-    "/AddWork",
-    "/AddWorkDetails",
     "/GalleryManagement",
     "/AboutUsManagement",
     "/AddDemartment",
     "/ContactQuery"
   ];
-  const shouldHideFooter = hideNavbarRoutes.includes(location.pathname);
+  const shouldHideFooter = hideFooterRoutes.includes(location.pathname);
 
   return (
     <>
@@ -69,16 +54,11 @@ function AppContent() {
           <Route path="/about" element={<About />} />
           
           {/* Protected Routes */}
-          <Route path="/AddWork" element={<ProtectedRoute allowedRoles={['department', 'it_cell', 'admin']}><AddWork /></ProtectedRoute>} />
-          <Route path="/AddWorkDetails" element={<ProtectedRoute allowedRoles={['department']}><AddWorkDetails /></ProtectedRoute>} />
           <Route path="/AdminDashboard" element={<ProtectedRoute allowedRoles={['admin']}><AdminDashboard /></ProtectedRoute>} />
-                    <Route path="/AddDemartment" element={<ProtectedRoute allowedRoles={['admin']}><AddDemartment /></ProtectedRoute>} />
+          <Route path="/AddDemartment" element={<ProtectedRoute allowedRoles={['admin']}><AddDemartment /></ProtectedRoute>} />
           <Route path="/ContactQuery" element={<ProtectedRoute allowedRoles={['admin']}><ContactQuery /></ProtectedRoute>} />
           <Route path="/GalleryManagement" element={<ProtectedRoute allowedRoles={['admin']}><GalleryManagement /></ProtectedRoute>} />
           <Route path="/AboutUsManagement" element={<ProtectedRoute allowedRoles={['admin']}><AboutUsManagement /></ProtectedRoute>} />
-          <Route path="/ITCellDashboard" element={<ProtectedRoute allowedRoles={['it_cell']}><ITCellDashboard /></ProtectedRoute>} />
-          <Route path="/DepartmentDashboard" element={<ProtectedRoute allowedRoles={['department']}><DepartmentDashboard /></ProtectedRoute>} />
-          <Route path="/ITCell/DepartmentDetails" element={<ProtectedRoute allowedRoles={['it_cell']}><DepartmentDetailsManagement /></ProtectedRoute>} />  
           <Route path="/Login" element={<Login />} />
           <Route path="/ContactUs" element={<ContactUs />} />
           <Route path="/gallery" element={<PhotoGallery />} /> {/* Add a new route for the gallery */}
