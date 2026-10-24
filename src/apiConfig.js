@@ -1,1 +1,1 @@
-export const API_BASE_URL = 'https://mahadevaaya.com/pauripargati/pauripargati_backend/api';
+export const API_BASE_URL = '/pauripargati/pauripargati_backend/api';

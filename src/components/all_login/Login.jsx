@@ -7,6 +7,14 @@ import ukLogo from '../../assets/images/uk_logo.png';
 import { API_BASE_URL } from '../../apiConfig';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
+const loginApi = axios.create({
+  baseURL: API_BASE_URL,
+  withCredentials: true,
+  withXSRFToken: true,
+  xsrfCookieName: 'csrftoken',
+  xsrfHeaderName: 'X-CSRFToken',
+});
+
 const ROLE_DASHBOARD_MAP = {
   admin: '/AdminDashboard',
   // it_cell: '/ITCellDashboard',
@@ -26,17 +34,40 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [departments, setDepartments] = useState([]);
+  const [captchaKey, setCaptchaKey] = useState('');
+  const [captchaImage, setCaptchaImage] = useState('');
+  const [captchaAnswer, setCaptchaAnswer] = useState('');
 
   useEffect(() => {
     const fetchDepartments = async () => {
       try {
-        const response = await axios.get(`${API_BASE_URL}/departments/`);
+        const response = await loginApi.get('/departments/');
         setDepartments(response.data);
       } catch (err) {
         console.error("Failed to fetch departments:", err);
       }
     };
     fetchDepartments();
+  }, []);
+
+  useEffect(() => {
+    const fetchCaptcha = async () => {
+      try {
+        const response = await loginApi.get('/generate-captcha/');
+        if (response.data.success) {
+          setCaptchaKey(response.data.captcha_key);
+          setCaptchaImage(
+            response.data.captcha_image.startsWith('http')
+              ? response.data.captcha_image
+              : `https://mahadevaaya.com${response.data.captcha_image}`,
+          );
+        }
+      } catch (err) {
+        console.error("Failed to fetch captcha:", err);
+        setError("Failed to load captcha. Please refresh the page.");
+      }
+    };
+    fetchCaptcha();
   }, []);
 
   const navigate = useNavigate();
@@ -70,30 +101,44 @@ const Login = () => {
       const payload = {
         username: username,
         password: password,
+        role: role,
+        captcha_key: captchaKey,
+        captcha_answer: captchaAnswer,
       };
 
-      const response = await axios.post(
-        `${API_BASE_URL}/login/`,
-        payload
-      );
+      const response = await loginApi.post('/login/', payload);
 
-      if (response.data.access) {
+      if (response.data.message === "Login successful") {
         login({
-          access: response.data.access,
-          refresh: response.data.refresh,
           role: response.data.role,
           unique_id: response.data.unique_id,
-          department_id: response.data.department_id,
-          user: response.data.user || null,
+          username: response.data.username,
+          user: null,
         });
         alert("Login Success!");
 
-        // Determine path from response role
         const targetPath = ROLE_DASHBOARD_MAP[response.data.role] || '/';
         navigate(targetPath);
       }
     } catch (err) {
-      setError(err.response?.data?.message || "Login Failed. Please check your credentials.");
+      setError(
+        err.response?.data?.message ||
+          "Login Failed. Please check your credentials and captcha.",
+      );
+      try {
+        const response = await loginApi.get('/generate-captcha/');
+        if (response.data.success) {
+          setCaptchaKey(response.data.captcha_key);
+          setCaptchaImage(
+            response.data.captcha_image.startsWith('http')
+              ? response.data.captcha_image
+              : `https://mahadevaaya.com${response.data.captcha_image}`,
+          );
+          setCaptchaAnswer('');
+        }
+      } catch (captchaErr) {
+        console.error("Failed to refresh captcha:", captchaErr);
+      }
     } finally {
       setLoading(false);
     }
@@ -114,24 +159,7 @@ const Login = () => {
         {/* Right Panel: Login Interface */}
         <div className="panel-right">
           
-          <div className="role-selector-section mb-4">
-            <p className="role-selector-title small mb-2 fw-bold text-uppercase tracking-wider">Login</p>
-            <div className="role-radio-group">
-              {['admin',].map((r) => (
-                <label key={r} className={`role-label-custom ${role === r ? 'active' : ''}`}>
-                  <input 
-                    type="radio" 
-                    name="role" 
-                    value={r} 
-                    checked={role === r} 
-                    onChange={(e) => handleRoleChange(e.target.value)} 
-                  />
-                  {r.replace('_', ' ').toUpperCase()}
-                </label>
-              ))}
-            </div>
-          </div>
-
+        
           <div className="inner-form-card shadow-sm">
             <h3 className="form-card-title">{role.replace('_', ' ').toUpperCase()} LOGIN</h3>
             
@@ -184,6 +212,51 @@ const Login = () => {
                   </button>
                 </div>
               </div>
+
+              {captchaKey && captchaImage && (
+                <div className="mb-4">
+                  <label className="form-label small fw-bold text-muted">
+                    Captcha
+                  </label>
+                  <div className="d-flex align-items-center gap-2">
+                    <img
+                      src={captchaImage}
+                      alt="Captcha"
+                      className="captcha-img"
+                      style={{ maxHeight: '45px', border: '1px solid #ddd' }}
+                    />
+                    <button
+                      type="button"
+                      className="btn btn-sm btn-outline-secondary"
+                      onClick={async () => {
+                        try {
+                          const response = await loginApi.get('/generate-captcha/');
+                          if (response.data.success) {
+                            setCaptchaKey(response.data.captcha_key);
+                            setCaptchaImage(
+                              response.data.captcha_image.startsWith('http')
+                                ? response.data.captcha_image
+                                : `https://mahadevaaya.com${response.data.captcha_image}`,
+                            );
+                            setCaptchaAnswer('');
+                          }
+                        } catch (err) {
+                          console.error("Failed to refresh captcha:", err);
+                        }
+                      }}
+                    >
+                      Refresh
+                    </button>
+                  </div>
+                  <input
+                    type="text"
+                    className="form-control form-control-sm bg-light border-0 mt-2"
+                    placeholder="Enter captcha answer"
+                    value={captchaAnswer}
+                    onChange={(e) => setCaptchaAnswer(e.target.value)}
+                  />
+                </div>
+              )}
 
               <div className="text-center">
                 <button 

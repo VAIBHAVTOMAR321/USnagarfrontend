@@ -1,237 +1,648 @@
-import React, { createContext, useContext, useState, useMemo, useEffect, useCallback } from 'react';
-import axios from 'axios';
-import { API_BASE_URL } from '../../apiConfig';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useMemo,
+  useEffect,
+  useCallback,
+  useRef,
+} from "react";
+import axios from "axios";
+import { API_BASE_URL } from "../../apiConfig";
 
 const AuthContext = createContext(null);
 
-const STORAGE_KEY = 'gyandhara_auth';
 const API_URL = API_BASE_URL;
+const CSRF_COOKIE_NAME = "csrftoken";
+const CSRF_HEADER_NAME = "X-CSRFToken";
 
+// ==========================================================
+// IDLE TIMEOUT SETTINGS (1 Minute)
+// ==========================================================
+const IDLE_TIMEOUT_MINUTES = 5;
+const IDLE_TIMEOUT_MS = IDLE_TIMEOUT_MINUTES * 60 * 1000;
+
+// ==========================================================
+// REFRESH CONTROL
+// ==========================================================
 let isRefreshing = false;
 let failedQueue = [];
 
-const processQueue = (error, token = null) => {
-  failedQueue.forEach(prom => {
+const processQueue = (error) => {
+  failedQueue.forEach((prom) => {
     if (error) {
       prom.reject(error);
     } else {
-      prom.resolve(token);
+      prom.resolve();
     }
   });
+
   failedQueue = [];
 };
 
-const createAxiosInstance = (accessToken, refreshToken, logout) => {
-  const instance = axios.create({
-    baseURL: API_URL,
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
+// ==========================================================
+// CSRF TOKEN
+// ==========================================================
+const getCSRFToken = () => {
+  let cookieValue = null;
 
-  instance.interceptors.request.use(
-    (config) => {
-      if (accessToken) {
-        config.headers.Authorization = `Bearer ${accessToken}`;
+  if (document.cookie && document.cookie !== "") {
+    const cookies = document.cookie.split(";");
+
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+
+      if (
+        cookie.substring(0, CSRF_COOKIE_NAME.length + 1) ===
+        CSRF_COOKIE_NAME + "="
+      ) {
+        cookieValue = decodeURIComponent(
+          cookie.substring(CSRF_COOKIE_NAME.length + 1),
+        );
+        break;
       }
-      return config;
-    },
-    (error) => Promise.reject(error)
-  );
-
-  instance.interceptors.response.use(
-    (response) => response,
-    async (error) => {
-      const originalRequest = error.config;
-
-      if (error.response?.status === 401 && !originalRequest._retry) {
-        if (isRefreshing) {
-          return new Promise((resolve, reject) => {
-            failedQueue.push({ resolve, reject });
-          }).then(token => {
-            originalRequest.headers.Authorization = `Bearer ${token}`;
-            return instance(originalRequest);
-          }).catch(err => Promise.reject(err));
-        }
-
-        originalRequest._retry = true;
-        isRefreshing = true;
-
-        try {
-          const response = await axios.post(`${API_URL}/token/refresh/`, {
-            refresh: refreshToken,
-          });
-
-          const { access } = response.data;
-          
-          processQueue(null, access);
-
-          originalRequest.headers.Authorization = `Bearer ${access}`;
-          return instance(originalRequest);
-        } catch (refreshError) {
-          processQueue(refreshError, null);
-          logout();
-          return Promise.reject(refreshError);
-        } finally {
-          isRefreshing = false;
-        }
-      }
-
-      return Promise.reject(error);
     }
-  );
+  }
 
-  return instance;
+  return cookieValue;
 };
 
+const getCSRFHeaders = () => {
+  const csrfToken = getCSRFToken();
+
+  return {
+    "Content-Type": "application/json",
+    ...(csrfToken ? { [CSRF_HEADER_NAME]: csrfToken } : {}),
+  };
+};
+
+// ==========================================================
+// AUTH FAILURE FLAG
+// ==========================================================
+let authFailureHandled = false;
+
+// ==========================================================
+// FULL LOGOUT FUNCTION REF (module-level bridge)
+// ==========================================================
+const fullLogoutRef = {
+  current: null,
+};
+
+// ==========================================================
+// MULTI-DEVICE LOGIN / FORCED LOGOUT HANDLER
+// Used when the user is ACTIVE but the backend kicks them out.
+// ==========================================================
+const handleLoggedInElsewhere = () => {
+  if (authFailureHandled) {
+    return false;
+  }
+
+  authFailureHandled = true;
+
+  alert(
+    "Your account has been logged in on another device. Please login again.",
+  );
+
+  if (fullLogoutRef.current) {
+    fullLogoutRef.current();
+  }
+
+  return true;
+};
+
+// ==========================================================
+// RESET AUTH FAILURE FLAG AFTER LOGIN
+// ==========================================================
+const resetAuthFailureFlag = () => {
+  authFailureHandled = false;
+};
+
+// ==========================================================
+// CLEAR JAVASCRIPT-ACCESSIBLE COOKIES
+// HttpOnly JWT cookies (access_token, refresh_token) MUST
+// be deleted by the backend /logout/ endpoint.
+// ==========================================================
+const clearClientCookies = () => {
+  const cookies = document.cookie ? document.cookie.split(";") : [];
+
+  cookies.forEach((cookie) => {
+    const cookieName = cookie.split("=")[0].trim();
+
+    if (!cookieName) {
+      return;
+    }
+
+    const paths = [
+      "/",
+      "/pauripargati",
+      "/pauripargati/Login",
+      "/pauripargati/DirectorDashboard",
+      "/pauripargati/DPODashboard",
+      "/pauripargati/CDPODashboard",
+      "/pauripargati/SectorDashBoard",
+      "/pauripargati/pauripargati_backend",
+      "/pauripargati/pauripargati_backend/api",
+    ];
+
+    const domains = ["", window.location.hostname, "localhost", "127.0.0.1"];
+
+    paths.forEach((path) => {
+      domains.forEach((domain) => {
+        document.cookie =
+          `${cookieName}=; ` +
+          `Max-Age=0; ` +
+          `expires=Thu, 01 Jan 1970 00:00:00 GMT; ` +
+          (domain ? `domain=${domain}; ` : "") +
+          `path=${path};`;
+      });
+    });
+  });
+};
+
+// ==========================================================
+// CLEAR STORAGE
+// ==========================================================
+const clearAllStorage = () => {
+  localStorage.clear();
+  sessionStorage.clear();
+};
+
+// ==========================================================
+// REQUEST CHECKS
+// ==========================================================
+const isRefreshTokenRequest = (error) => {
+  const requestUrl = error?.config?.url || "";
+  return requestUrl.includes("/refresh-token/");
+};
+
+const isSessionStatusRequest = (error) => {
+  const requestUrl = error?.config?.url || "";
+  return requestUrl.includes("/session-status/");
+};
+
+// ==========================================================
+// AUTH PROVIDER
+// ==========================================================
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
-  const [accessToken, setAccessToken] = useState(null);
-  const [refreshToken, setRefreshToken] = useState(null);
   const [role, setRole] = useState(null);
   const [uniqueId, setUniqueId] = useState(null);
-  const [departmentId, setDepartmentId] = useState(null);
   const [isReady, setIsReady] = useState(false);
 
-  // Restore auth state from localStorage on mount
-  useEffect(() => {
-    const initializeAuth = async () => {
-      const savedAuth = localStorage.getItem(STORAGE_KEY);
-      if (savedAuth) {
-        try {
-          const parsed = JSON.parse(savedAuth);
-          setUser(parsed.user || null);
-          setRefreshToken(parsed.refresh || null);
-          setRole(parsed.role || null);
-          setUniqueId(parsed.unique_id || null);
-          setDepartmentId(parsed.department_id || null);
+  const refreshPromiseRef = useRef(null);
+  const logoutTimerRef = useRef(null);
+  const sessionCheckTimerRef = useRef(null);
 
-          if (parsed.refresh) {
-            // Auto-refresh token on page load/refresh
-            try {
-              const response = await axios.post(`${API_URL}/token/refresh/`, {
-                refresh: parsed.refresh,
-              });
-              setAccessToken(response.data.access);
-            } catch (error) {
-              console.error('Initial refresh failed:', error);
-              localStorage.clear();
-              setUser(null);
-              setAccessToken(null);
-              setRefreshToken(null);
-              setRole(null);
-              setUniqueId(null);
-              setDepartmentId(null);
-              if (window.location.pathname !== '/Login') {
-                window.location.href = '/pauripargati/Login';
-              }
-            }
-          } else {
-            setAccessToken(parsed.access || null);
-          }
-        } catch (err) {
-          console.error('Failed to parse auth data:', err);
-          localStorage.clear();
+  const isAuthenticatedRef = useRef(false);
+  const isLoggingOutRef = useRef(false);
+
+  const lastActivityRef = useRef(Date.now());
+
+  // ========================================================
+  // REAL LOGOUT (FULL PROCEDURE)
+  // This is ALWAYS called, even if the session is dead.
+  // ========================================================
+  const logout = useCallback(async ({ timedOut = false } = {}) => {
+    if (isLoggingOutRef.current) {
+      return;
+    }
+
+    isLoggingOutRef.current = true;
+
+    // Prevent interceptors from firing 401s or logging errors during logout
+    authFailureHandled = true;
+
+    // ----------------------------------------------------
+    // Stop refresh/retry processing
+    // ----------------------------------------------------
+    isRefreshing = false;
+
+    failedQueue.forEach(({ reject }) => {
+      if (reject) {
+        reject(new Error("Logout in progress"));
+      }
+    });
+
+    failedQueue = [];
+    refreshPromiseRef.current = null;
+
+    // ----------------------------------------------------
+    // Stop idle timer
+    // ----------------------------------------------------
+    if (logoutTimerRef.current) {
+      clearTimeout(logoutTimerRef.current);
+      logoutTimerRef.current = null;
+    }
+
+    // ----------------------------------------------------
+    // Stop session polling
+    // ----------------------------------------------------
+    if (sessionCheckTimerRef.current) {
+      clearInterval(sessionCheckTimerRef.current);
+      sessionCheckTimerRef.current = null;
+    }
+
+    // ----------------------------------------------------
+    // Read CSRF BEFORE clearing cookies
+    // ----------------------------------------------------
+    const csrfToken = getCSRFToken();
+
+    try {
+      // ALWAYS CALL BACKEND LOGOUT TO DELETE HTTPONLY COOKIES
+      const response = await fetch(`${API_URL}/logout/`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          ...(csrfToken ? { [CSRF_HEADER_NAME]: csrfToken } : {}),
+        },
+      });
+
+      if (!response.ok) {
+        console.warn(
+          `Logout API responded with status: ${response.status}. ` +
+            `If this is 401/403, your backend /logout/ endpoint MUST be set to AllowAny so it can delete HttpOnly cookies even when the JWT is invalid.`,
+        );
+      }
+    } catch (error) {
+      console.error("Logout API network error:", error);
+    } finally {
+      // --------------------------------------------------
+      // Clear frontend authentication state
+      // --------------------------------------------------
+      setUser(null);
+      setRole(null);
+      setUniqueId(null);
+
+      isAuthenticatedRef.current = false;
+      isLoggingOutRef.current = false;
+
+      // --------------------------------------------------
+      // Clear storage & JS-accessible cookies
+      // --------------------------------------------------
+      clearAllStorage();
+      clearClientCookies();
+
+      // --------------------------------------------------
+      // Idle timeout message (ONLY if timedOut is true)
+      // --------------------------------------------------
+      if (timedOut) {
+        alert(
+          `You were idle for ${IDLE_TIMEOUT_MINUTES} minutes. ` +
+            "Your session has expired. Please login again.",
+        );
+      }
+
+      // --------------------------------------------------
+      // Redirect to login
+      // --------------------------------------------------
+      window.history.replaceState(null, "", "/wecdschemes/Login");
+      window.location.replace("/wecdschemes/Login");
+    }
+  }, []);
+
+  // ========================================================
+  // REGISTER LOGOUT WITH MODULE-LEVEL BRIDGE
+  // ========================================================
+  useEffect(() => {
+    fullLogoutRef.current = () => logout();
+  }, [logout]);
+
+  // ========================================================
+  // LOGIN
+  // ========================================================
+  const login = useCallback(
+    (data) => {
+      resetAuthFailureFlag();
+      isLoggingOutRef.current = false;
+
+      if (data.role && data.unique_id) {
+        setUser(data.username || null);
+        setRole(data.role);
+        setUniqueId(data.unique_id);
+
+        isAuthenticatedRef.current = true;
+
+        lastActivityRef.current = Date.now();
+      } else {
+        logout();
+      }
+    },
+    [logout],
+  );
+
+  // ========================================================
+  // REFRESH ACCESS TOKEN
+  // ========================================================
+  const refreshAccessToken = useCallback(async () => {
+    if (authFailureHandled) {
+      return false;
+    }
+
+    if (isRefreshing && refreshPromiseRef.current) {
+      return refreshPromiseRef.current;
+    }
+
+    isRefreshing = true;
+
+    refreshPromiseRef.current = axios.post(
+      `${API_URL}/refresh-token/`,
+      {},
+      {
+        withCredentials: true,
+        withXSRFToken: true,
+        xsrfCookieName: CSRF_COOKIE_NAME,
+        xsrfHeaderName: CSRF_HEADER_NAME,
+        headers: getCSRFHeaders(),
+      },
+    );
+
+    try {
+      await refreshPromiseRef.current;
+
+      processQueue(null);
+
+      return true;
+    } catch (error) {
+      console.error("Refresh token failed:", error);
+
+      if (isAuthenticatedRef.current) {
+        if (Date.now() - lastActivityRef.current >= IDLE_TIMEOUT_MS) {
+          await logout({ timedOut: true });
+        } else {
+          await logout();
         }
       }
-      setIsReady(true);
+
+      processQueue(error);
+
+      return false;
+    } finally {
+      isRefreshing = false;
+      refreshPromiseRef.current = null;
+    }
+  }, [logout]);
+
+  // ========================================================
+  // INITIALIZE AUTH STATE
+  // ========================================================
+  useEffect(() => {
+    setIsReady(true);
+    isAuthenticatedRef.current = !!user;
+  }, [user]);
+
+  // ========================================================
+  // IDLE TIMEOUT (5 Minutes)
+  // ========================================================
+  useEffect(() => {
+    if (!user || !role || !isAuthenticatedRef.current) {
+      if (logoutTimerRef.current) {
+        clearTimeout(logoutTimerRef.current);
+        logoutTimerRef.current = null;
+      }
+      return undefined;
+    }
+
+    const resetIdleTimer = () => {
+      lastActivityRef.current = Date.now();
+
+      if (logoutTimerRef.current) {
+        clearTimeout(logoutTimerRef.current);
+      }
+
+      logoutTimerRef.current = setTimeout(() => {
+        logout({ timedOut: true });
+      }, IDLE_TIMEOUT_MS);
     };
 
-    initializeAuth();
-  }, []);
+    const activityEvents = [
+      "click",
+      "keydown",
+      "mousemove",
+      "scroll",
+      "touchstart",
+    ];
 
-  // Persist auth state to localStorage on changes
-  useEffect(() => {
-    if (accessToken) {
-      const authData = {
-        user,
-        access: accessToken,
-        refresh: refreshToken,
-        role,
-        unique_id: uniqueId,
-        department_id: departmentId,
-      };
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(authData));
-    } else {
-      localStorage.removeItem(STORAGE_KEY);
-    }
-  }, [user, accessToken, refreshToken, role, uniqueId, departmentId]);
+    activityEvents.forEach((eventName) => {
+      window.addEventListener(eventName, resetIdleTimer);
+    });
 
-  const login = useCallback((data) => {
-    setUser(data.user);
-    setAccessToken(data.access);
-    setRefreshToken(data.refresh);
-    setRole(data.role);
-    setUniqueId(data.unique_id);
-    setDepartmentId(data.department_id);
-  }, []);
+    resetIdleTimer();
 
-  const logout = useCallback(() => {
-    setUser(null);
-    setAccessToken(null);
-    setRefreshToken(null);
-    setRole(null);
-    setUniqueId(null);
-    setDepartmentId(null);
-    localStorage.clear();
-    // Force redirect to login page
-    if (window.location.pathname !== '/Login') {
-      window.location.href = '/pauripargati/Login';
-    }
-  }, []);
-
-  const refreshAccessToken = useCallback(async () => {
-    if (!refreshToken) return null;
-    
-    try {
-      const response = await axios.post(`${API_URL}/token/refresh/`, {
-        refresh: refreshToken,
+    return () => {
+      activityEvents.forEach((eventName) => {
+        window.removeEventListener(eventName, resetIdleTimer);
       });
-      const { access } = response.data;
-      setAccessToken(access);
-      return access;
-    } catch (error) {
-      logout();
-      return null;
-    }
-  }, [refreshToken, logout]);
 
-  // Proactive token refresh every 1 minute
+      if (logoutTimerRef.current) {
+        clearTimeout(logoutTimerRef.current);
+        logoutTimerRef.current = null;
+      }
+    };
+  }, [user, role, logout]);
+
+  // ========================================================
+  // PREVENT BACK NAVIGATION AFTER LOGOUT
+  // ========================================================
   useEffect(() => {
-    let intervalId;
-    if (accessToken && refreshToken) {
-      intervalId = setInterval(() => {
-        refreshAccessToken();
-      }, 60000); // 60,000ms = 1 minute
+    const handlePopState = () => {
+      if (!isAuthenticatedRef.current) {
+        window.location.replace("/wecdschemes/Login");
+      } else {
+        const path = window.location.pathname;
+        const isLoginPage = path.includes("/Login") || path.includes("/login");
+
+        if (isLoginPage) {
+          window.history.forward();
+          const confirmed = window.confirm("Are you sure you want to logout?");
+          if (confirmed) {
+            logout();
+          }
+        }
+      }
+    };
+
+    window.addEventListener("popstate", handlePopState);
+
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
+    };
+  }, [logout]);
+
+  // ========================================================
+  // AUTHENTICATED AXIOS INSTANCE
+  // ========================================================
+  const api = useMemo(() => {
+    const instance = axios.create({
+      baseURL: API_URL,
+      withCredentials: true,
+      withXSRFToken: true,
+      xsrfCookieName: CSRF_COOKIE_NAME,
+      xsrfHeaderName: CSRF_HEADER_NAME,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    // ======================================================
+    // REQUEST INTERCEPTOR
+    // ======================================================
+    instance.interceptors.request.use(
+      (config) => {
+        const method = config.method?.toUpperCase();
+
+        if (["POST", "PUT", "PATCH", "DELETE"].includes(method)) {
+          const csrfToken = getCSRFToken();
+          if (csrfToken) {
+            config.headers[CSRF_HEADER_NAME] = csrfToken;
+          }
+        }
+
+        // Let the browser set the correct multipart boundary for file uploads
+        if (config.data instanceof FormData) {
+          delete config.headers["Content-Type"];
+        }
+
+        return config;
+      },
+      (error) => Promise.reject(error),
+    );
+
+    // ======================================================
+    // RESPONSE INTERCEPTOR
+    // ======================================================
+    instance.interceptors.response.use(
+      (response) => response,
+
+      async (error) => {
+        const originalRequest = error.config;
+
+        if (authFailureHandled) {
+          return new Promise(() => {});
+        }
+
+        if (error.response?.status === 401) {
+          if (!isAuthenticatedRef.current) {
+            return Promise.reject(error);
+          }
+
+          // CASE 1: ALREADY RETRIED -> STILL 401
+          // The session is completely dead.
+          if (originalRequest?._retry) {
+            if (Date.now() - lastActivityRef.current >= IDLE_TIMEOUT_MS) {
+              logout({ timedOut: true });
+            } else {
+              handleLoggedInElsewhere();
+            }
+            return new Promise(() => {});
+          }
+
+          // CASE 2: FIRST 401 -> TRY REFRESH
+          if (isRefreshing) {
+            return new Promise((resolve, reject) => {
+              failedQueue.push({ resolve, reject });
+            })
+              .then(() => instance(originalRequest))
+              .catch(() => new Promise(() => {}));
+          }
+
+          originalRequest._retry = true;
+
+          const refreshed = await refreshAccessToken();
+
+          if (refreshed) {
+            const method = originalRequest.method?.toUpperCase();
+            if (["POST", "PUT", "PATCH", "DELETE"].includes(method)) {
+              const csrfToken = getCSRFToken();
+              if (csrfToken) {
+                originalRequest.headers[CSRF_HEADER_NAME] = csrfToken;
+              }
+            }
+            return instance(originalRequest);
+          }
+
+          return new Promise(() => {});
+        }
+
+        return Promise.reject(error);
+      },
+    );
+
+    return instance;
+  }, [logout, refreshAccessToken]);
+
+  // ========================================================
+  // SESSION STATUS POLLING
+  // ========================================================
+  useEffect(() => {
+    if (!isAuthenticatedRef.current || !user || !role || !api) {
+      if (sessionCheckTimerRef.current) {
+        clearInterval(sessionCheckTimerRef.current);
+        sessionCheckTimerRef.current = null;
+      }
+      return undefined;
     }
-    return () => clearInterval(intervalId);
-  }, [accessToken, refreshToken, refreshAccessToken]);
 
-  const value = useMemo(() => ({
-    user,
-    accessToken,
-    refreshToken,
-    role,
-    uniqueId,
-    departmentId,
-    login,
-    logout,
-    refreshAccessToken,
-    isAuthenticated: !!accessToken,
-    isReady,
-  }), [user, accessToken, refreshToken, role, uniqueId, departmentId, isReady, login, logout, refreshAccessToken]);
+    const checkSessionStatus = async () => {
+      if (authFailureHandled || isRefreshing || isLoggingOutRef.current) {
+        return;
+      }
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
+      try {
+        const response = await api.get("/session-status/");
+        if (response?.data?.valid === false) {
+          await logout();
+        }
+      } catch (error) {
+        // 401 is handled by axios interceptor.
+      }
+    };
+
+    const initialCheckTimer = setTimeout(() => {
+      checkSessionStatus();
+      sessionCheckTimerRef.current = setInterval(checkSessionStatus, 30000);
+    }, 2000);
+
+    return () => {
+      clearTimeout(initialCheckTimer);
+
+      if (sessionCheckTimerRef.current) {
+        clearInterval(sessionCheckTimerRef.current);
+        sessionCheckTimerRef.current = null;
+      }
+    };
+  }, [user, role, api, logout]);
+
+  // ========================================================
+  // CONTEXT VALUE
+  // ========================================================
+  const value = useMemo(
+    () => ({
+      user,
+      role,
+      uniqueId,
+      login,
+      logout,
+      api,
+      refreshAccessToken,
+      isAuthenticated: isAuthenticatedRef.current,
+      isReady,
+    }),
+    [user, role, uniqueId, login, logout, api, refreshAccessToken, isReady],
   );
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
+// ==========================================================
+// USE AUTH
+// ==========================================================
 export function useAuth() {
   const context = useContext(AuthContext);
+
   if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
+
   return context;
 }
