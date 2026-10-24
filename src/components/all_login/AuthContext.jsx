@@ -634,14 +634,33 @@ export function AuthProvider({ children }) {
         return;
       }
 
-      try {
-        const response = await api.get("/session-status/");
-        if (response?.data?.valid === false) {
-          await logout();
-        }
-      } catch (error) {
-        // 401 is handled by axios interceptor.
-      }
+       try {
+         const response = await api.get("/session-status/");
+         if (response?.data?.valid === false) {
+           const message =
+             response?.data?.message ||
+             response?.data?.error ||
+             "Your session is no longer active. Please login again.";
+           alert(message);
+           await logout();
+         } else if (
+           response?.data?.valid === true &&
+           response?.data?.message &&
+           !/active/i.test(response.data.message)
+         ) {
+           alert(response.data.message);
+           await logout();
+         }
+       } catch (error) {
+         // 401 is handled by axios interceptor.
+         const backendMessage =
+           error?.response?.data?.message ||
+           error?.response?.data?.error ||
+           error?.response?.data?.detail;
+         if (backendMessage) {
+           console.error("Session status error:", backendMessage);
+         }
+       }
     };
 
     const initialCheckTimer = setTimeout(() => {
