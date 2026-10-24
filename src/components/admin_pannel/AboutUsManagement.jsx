@@ -67,7 +67,6 @@ const AboutUsManagement = () => {
 
       setAboutItems(Array.isArray(items) ? items : []);
     } catch (err) {
-      console.error("GET About Us error:", err);
 
       setError(
         err.response?.data?.detail ||
@@ -263,7 +262,6 @@ const AboutUsManagement = () => {
 
       await fetchAboutUs();
     } catch (err) {
-      console.error("Save About Us error:", err);
 
       const responseData = err.response?.data;
 
@@ -306,7 +304,6 @@ const AboutUsManagement = () => {
 
       await fetchAboutUs();
     } catch (err) {
-      console.error("Delete About Us error:", err);
 
       setError(
         err.response?.data?.detail ||

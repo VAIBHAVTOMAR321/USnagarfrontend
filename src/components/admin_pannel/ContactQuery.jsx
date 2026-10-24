@@ -49,7 +49,6 @@ const ContactQuery = () => {
 
       setEnquiries(Array.isArray(items) ? items : []);
     } catch (err) {
-      console.error("GET Contact Enquiries error:", err);
 
       setError(
         err.response?.data?.detail ||
@@ -98,7 +97,6 @@ const ContactQuery = () => {
 
       await fetchEnquiries();
     } catch (err) {
-      console.error("Delete Contact Enquiry error:", err);
 
       setError(
         err.response?.data?.detail ||

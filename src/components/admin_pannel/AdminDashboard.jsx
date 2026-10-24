@@ -64,7 +64,6 @@ const AdminDashboard = () => {
 
       setCarouselItems(Array.isArray(items) ? items : []);
     } catch (err) {
-      console.error("GET carousel error:", err);
 
       setError(
         err.response?.data?.detail ||
@@ -251,7 +250,6 @@ const AdminDashboard = () => {
 
       await fetchCarousel();
     } catch (err) {
-      console.error("Save carousel error:", err);
 
       const responseData = err.response?.data;
 
@@ -294,7 +292,6 @@ const AdminDashboard = () => {
 
       await fetchCarousel();
     } catch (err) {
-      console.error("Delete carousel error:", err);
 
       setError(
         err.response?.data?.detail ||

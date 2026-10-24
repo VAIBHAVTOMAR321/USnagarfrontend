@@ -47,8 +47,7 @@ const ContactUs = () => {
       alert("Thank you! Your message has been received.");
       setFormData({ name: "", email: "", phone: "", subject: "", message: "" });
     } catch (err) {
-      console.error("Contact form submission failed:", err);
-      alert("Something went wrong. Please try again later.");
+
     }
   };
 

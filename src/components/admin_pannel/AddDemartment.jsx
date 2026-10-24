@@ -59,7 +59,6 @@ const AddDemartment = () => {
 
       setDepartments(Array.isArray(items) ? items : []);
     } catch (err) {
-      console.error("GET Departments error:", err);
 
       setError(
         err.response?.data?.detail ||
@@ -158,7 +157,6 @@ const AddDemartment = () => {
 
       await fetchDepartments();
     } catch (err) {
-      console.error("Save Department error:", err);
 
       const responseData = err.response?.data;
 
@@ -201,7 +199,6 @@ const AddDemartment = () => {
 
       await fetchDepartments();
     } catch (err) {
-      console.error("Delete Department error:", err);
 
       setError(
         err.response?.data?.detail ||

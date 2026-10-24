@@ -63,7 +63,6 @@ const GalleryManagement = () => {
 
       setgalleryItems(Array.isArray(items) ? items : []);
     } catch (err) {
-      console.error("GET Gallery error:", err);
 
       setError(
         err.response?.data?.detail ||
@@ -244,7 +243,6 @@ const GalleryManagement = () => {
 
       await fetchGallery();
     } catch (err) {
-      console.error("Save Gallery error:", err);
 
       const responseData = err.response?.data;
 
@@ -287,7 +285,6 @@ const GalleryManagement = () => {
 
       await fetchGallery();
     } catch (err) {
-      console.error("Delete Gallery error:", err);
 
       setError(
         err.response?.data?.detail ||
