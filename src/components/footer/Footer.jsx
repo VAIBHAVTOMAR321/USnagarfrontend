@@ -123,7 +123,7 @@ const Footer = () => {
             &copy; <a href="#">Pauri District Portal</a>, All right reserved.
           </p>
           <p>
-            Designed By <a href="#">Zero Error Enterprises</a>
+          Designed By <a href="https://zeeindia.in/" target="_blank" rel="noopener noreferrer">Zero Error Enterprises</a>
           </p>
         </div>
       </div>
