@@ -43,9 +43,8 @@ const Login = () => {
       try {
         const response = await loginApi.get('/departments/');
         setDepartments(response.data);
-      } catch (err) {
-        console.error("Failed to fetch departments:", err);
-      }
+       } catch (err) {
+       }
     };
     fetchDepartments();
   }, []);
@@ -62,10 +61,8 @@ const Login = () => {
               : `https://mahadevaaya.com${response.data.captcha_image}`,
           );
         }
-      } catch (err) {
-        console.error("Failed to fetch captcha:", err);
-        setError("Failed to load captcha. Please refresh the page.");
-      }
+       } catch (err) {
+       }
     };
     fetchCaptcha();
   }, []);
@@ -144,9 +141,8 @@ const Login = () => {
           );
           setCaptchaAnswer('');
         }
-      } catch (captchaErr) {
-        console.error("Failed to refresh captcha:", captchaErr);
-      }
+       } catch (captchaErr) {
+       }
     } finally {
       setLoading(false);
     }
@@ -248,9 +244,8 @@ const Login = () => {
                             );
                             setCaptchaAnswer('');
                           }
-                        } catch (err) {
-                          console.error("Failed to refresh captcha:", err);
-                        }
+                         } catch (err) {
+                         }
                       }}
                     >
                       Refresh
