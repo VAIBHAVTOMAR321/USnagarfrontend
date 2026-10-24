@@ -281,7 +281,7 @@ const AdminDashboard = () => {
     setDeletingId(id);
 
     try {
-      await api.delete(`${CAROUSEL_URL}${id}/`, {
+      await api.delete(`${CAROUSEL_URL}`, {
         data: { id },
         withCredentials: true,
       });
