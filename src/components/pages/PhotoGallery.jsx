@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { API_BASE_URL } from '../../apiConfig';
 import '../../assets/css/about.css';
+import Image from "../../assets/images/photo-1.jpg"
 
 const PLACEHOLDER = "../images/photo.avif";
 
@@ -44,7 +45,7 @@ export const GalleryIntro = () => {
       <Col lg={5} className="animate__animated animate__fadeInLeft">
         <div className="about-image-wrapper">
           <img 
-            src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1200&q=80" 
+            src={Image} 
             alt="Scenic View of District" 
             className="img-fluid about-hero-img rounded shadow-sm"
           />
