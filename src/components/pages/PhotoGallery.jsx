@@ -5,7 +5,7 @@ import axios from 'axios';
 import { API_BASE_URL } from '../../apiConfig';
 import '../../assets/css/about.css';
 
-const PLACEHOLDER = 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=800&q=80';
+const PLACEHOLDER = "../images/photo.avif";
 
 const IMAGE_PREFIX = '/pauripargati/pauripargati_backend';
 

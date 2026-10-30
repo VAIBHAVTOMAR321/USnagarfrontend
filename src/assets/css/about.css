@@ -8,7 +8,7 @@
 
 .about-breadcrumb-area {
     background: linear-gradient(rgba(0, 31, 63, 0.75), rgba(0, 31, 63, 0.75)), 
-                url('https://images.unsplash.com/photo-1493246507139-91e8bef99c02?auto=format&fit=crop&w=1920&q=80') center/cover no-repeat;
+                url('../images/photo.avif') center/cover no-repeat;
     padding: 50px 0;
     margin-bottom: 40px;
     text-align: center;
