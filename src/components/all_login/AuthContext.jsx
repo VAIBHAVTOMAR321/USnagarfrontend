@@ -364,8 +364,6 @@ export function AuthProvider({ children }) {
 
       return true;
     } catch (error) {
-      console.error("Refresh token failed:", error);
-
       if (isAuthenticatedRef.current) {
         if (Date.now() - lastActivityRef.current >= IDLE_TIMEOUT_MS) {
           await logout({ timedOut: true });
@@ -579,12 +577,20 @@ export function AuthProvider({ children }) {
         isAuthenticatedRef.current = true;
         lastActivityRef.current = Date.now();
       } else {
-        // Validate the HttpOnly session before restoring state.
+        const stored = sessionStorage.getItem("auth_user");
+
+        if (!stored) {
+          if (mounted) {
+            setIsReady(true);
+          }
+
+          return;
+        }
+
         try {
           const response = await api.get("/session-status/");
 
           if (response?.data?.valid === true) {
-            const stored = sessionStorage.getItem("auth_user");
             if (stored) {
               try {
                 const data = JSON.parse(stored);
@@ -651,16 +657,8 @@ export function AuthProvider({ children }) {
            alert(response.data.message);
            await logout();
          }
-       } catch (error) {
-         // 401 is handled by axios interceptor.
-         const backendMessage =
-           error?.response?.data?.message ||
-           error?.response?.data?.error ||
-           error?.response?.data?.detail;
-         if (backendMessage) {
-           console.error("Session status error:", backendMessage);
-         }
-       }
+        } catch (error) {
+        }
     };
 
     const initialCheckTimer = setTimeout(() => {
